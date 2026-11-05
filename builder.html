@@ -115,11 +115,24 @@ function layoutEditor(label,path,value='top'){
   if(!['top','bottom','inline'].includes(value))value=value==='right'?'bottom':'top';
   const widthPath=path.replace(/Layout$/,'Width');
   const width=widthPath.split('.').reduce((obj,key)=>obj?.[key],data)??100;
+  const owner=path.split('.').slice(0,-1).reduce((obj,key)=>obj?.[key],data);
+  const marker=path.includes('bodyImages.')?'<!--image:'+owner.id+'-->':'<!--image-->';
   return field(label,path,value,'select',[
     option('top','本文の上',value),option('bottom','本文の下',value),
-    ...(path==='coverLayout'&&data.type==='series'?[]:[option('inline','文中（<!--image--> の位置）',value)])
+    ...(path==='coverLayout'&&data.type==='series'?[]:[option('inline','文中（挿入用コードの位置）',value)])
   ].join(''))+field('画像の表示幅（本文幅に対する %）',widthPath,width,'number','min="10" max="100" step="5"')+
-    '<p class="help">幅は10〜100%で調整できます。文中に置く場合は本文の好きな位置に &lt;!--image--&gt; を入れてください。指定がなければ本文の下に表示します。</p>';
+    `<p class="help">幅は10〜100%で調整できます。文中に置く場合は本文の好きな位置に <code>${escapeHtml(marker)}</code> を入れてください。指定がなければ本文の下に表示します。</p>`;
+}
+function bodyImagesEditor(owner,path=''){
+  const prefix=path?path+'.':'';
+  return `<div class="group"><h3>追加の本文画像</h3><p class="help">画像ごとに位置・幅・形式を設定できます。文中へ入れる場合は、各画像の挿入用コードを本文に貼り付けてください。</p>${(owner.bodyImages||[]).map((item,i)=>{
+    const base=prefix+'bodyImages.'+i;
+    return `<div class="group"><strong>追加画像 ${i+1}</strong><p class="help">挿入用コード：<code>${escapeHtml('<!--image:'+item.id+'-->')}</code></p>
+      ${imageEditor('追加画像 '+(i+1),base+'.image',item,'image')}
+      ${field('画像の代替テキスト',base+'.imageAlt',item.imageAlt)}
+      ${layoutEditor('画像の位置',base+'.imageLayout',item.imageLayout)}
+      <button class="btn warn" data-action="delete-body-image" data-owner="${path}" data-index="${i}">この画像枠を削除</button></div>`;
+  }).join('')}<button class="btn" data-action="add-body-image" data-owner="${path}">＋ 本文画像を追加</button></div>`;
 }
 function imageEditor(label,path,item,key){
   const image=safeImage(item[key]);
@@ -139,8 +152,8 @@ ${data.type==='series'?field('連載記事の表示順','seriesOrder',data.serie
 ${field('ブラウザのタブに表示するタイトル','browserTitle',data.browserTitle)}
 <p class="help">空欄の場合は題名やサイト名から自動で表示します。</p>${data.type==='home'?`${field('最新コラムの日付','date',data.date,'date')}${field('最新コラムのタイトル','pageTitle',data.pageTitle)}`:''}${data.type==='series'?'<p class="help">各回のタイトルや本文は「記事・リンク」で編集します。</p>':`${field(data.type==='home'?'最新コラム本文':'ページ本文','body',data.body,'textarea')}<p class="help">改行はそのまま反映します。通常の文章を入力してください。折りたたみは144字以降の文末・段落が目安です。文中への画像挿入位置は &lt;!--image--&gt; で指定できます。好きな位置で折りたたむには &lt;!--more--&gt; を入れてください（公開ページには表示されません）。</p>`}</div>`;
 if(tab==='articles'){
-if(data.type==='home')html=`<div class="form"><div class="group"><h3>過去のコラム</h3><p class="help">公開時は日付の新しい順に10本までトップに表示し、残りはアーカイブに掲載します。すべての原稿をここで編集できます。</p><div id="entryList">${data.entries.map((e,i)=>`<div class="group"><div class="split">${field('日付',`entries.${i}.date`,e.date,'date')}${field('タイトル',`entries.${i}.title`,e.title)}</div>${field('本文',`entries.${i}.body`,e.body,'textarea')}${imageEditor('記事の画像',`entries.${i}.image`,e,'image')}${field('画像の代替テキスト',`entries.${i}.imageAlt`,e.imageAlt)}${layoutEditor('記事画像の位置',`entries.${i}.imageLayout`,e.imageLayout,e.imageWidth)}<button class="btn warn" data-action="delete-entry" data-index="${i}">この過去記事を削除</button></div>`).join('')}</div><div class="tools"><button class="btn" data-action="add-entry">＋ 過去記事を追加</button><button class="btn" data-action="archive-latest">最新コラムを過去ログに移す</button></div></div>${linkEditor()}</div>`;
-else if(data.type==='series')html=`<div class="form"><div class="group"><h3>連載の記事</h3>${data.sections.map((e,i)=>`<div class="group"><div class="split">${field('記事タイトル',`sections.${i}.title`,e.title)}${field('日付',`sections.${i}.date`,e.date,'date')}</div>${field('本文',`sections.${i}.body`,e.body,'textarea')}<p class="help">先頭記事は144字以降の文末・段落で折りたたみます。&lt;!--more--&gt; で位置を指定できます。</p>${imageEditor('記事の画像',`sections.${i}.image`,e,'image')}${field('画像の代替テキスト',`sections.${i}.imageAlt`,e.imageAlt)}${layoutEditor('記事画像の位置',`sections.${i}.imageLayout`,e.imageLayout,e.imageWidth)}<button class="btn warn" data-action="delete-section" data-index="${i}">この記事を削除</button></div>`).join('')}<button class="btn" data-action="add-section">＋ 連載記事を追加</button></div>${linkEditor()}</div>`;
+if(data.type==='home')html=`<div class="form"><div class="group"><h3>過去のコラム</h3><p class="help">公開時は日付の新しい順に10本までトップに表示し、残りはアーカイブに掲載します。すべての原稿をここで編集できます。</p><div id="entryList">${data.entries.map((e,i)=>`<div class="group"><div class="split">${field('日付',`entries.${i}.date`,e.date,'date')}${field('タイトル',`entries.${i}.title`,e.title)}</div>${field('本文',`entries.${i}.body`,e.body,'textarea')}${imageEditor('記事の画像',`entries.${i}.image`,e,'image')}${field('画像の代替テキスト',`entries.${i}.imageAlt`,e.imageAlt)}${layoutEditor('記事画像の位置',`entries.${i}.imageLayout`,e.imageLayout,e.imageWidth,e.bodyImages)}${bodyImagesEditor(e,`entries.${i}`)}<button class="btn warn" data-action="delete-entry" data-index="${i}">この過去記事を削除</button></div>`).join('')}</div><div class="tools"><button class="btn" data-action="add-entry">＋ 過去記事を追加</button><button class="btn" data-action="archive-latest">最新コラムを過去ログに移す</button></div></div>${linkEditor()}</div>`;
+else if(data.type==='series')html=`<div class="form"><div class="group"><h3>連載の記事</h3>${data.sections.map((e,i)=>`<div class="group"><div class="split">${field('記事タイトル',`sections.${i}.title`,e.title)}${field('日付',`sections.${i}.date`,e.date,'date')}</div>${field('本文',`sections.${i}.body`,e.body,'textarea')}<p class="help">先頭記事は144字以降の文末・段落で折りたたみます。&lt;!--more--&gt; で位置を指定できます。</p>${imageEditor('記事の画像',`sections.${i}.image`,e,'image')}${field('画像の代替テキスト',`sections.${i}.imageAlt`,e.imageAlt)}${layoutEditor('記事画像の位置',`sections.${i}.imageLayout`,e.imageLayout,e.imageWidth,e.bodyImages)}${bodyImagesEditor(e,`sections.${i}`)}<button class="btn warn" data-action="delete-section" data-index="${i}">この記事を削除</button></div>`).join('')}<button class="btn" data-action="add-section">＋ 連載記事を追加</button></div>${linkEditor()}</div>`;
 else html=`<div class="form">${linkEditor()}</div>`;
 }
 if(tab==='design')html=`<div class="form"><div class="group"><h3>文字・色</h3><div class="split">${field('背景色','design.background',d.background,'color')}${field('文字色','design.ink',d.ink,'color')}${field('リンク色','design.accent',d.accent,'color')}${field('区切り線','design.line',d.line,'color')}</div><div class="split">${field('本文文字サイズ(px)','design.fontSize',d.fontSize,'number','min="12" max="26"')}${field('行間','design.lineHeight',d.lineHeight,'number','min="1.2" max="2.6" step="0.1"')}${field('本文最大幅(px)','design.maxWidth',d.maxWidth,'number','min="400" max="1200"')}</div></div><div class="group"><h3>見出し・表示</h3>${field('日付の表示','design.titleDate',d.titleDate,'select',[option('above','タイトルの上',d.titleDate),option('inline','タイトルの前に表示',d.titleDate),option('none','表示しない',d.titleDate)].join(''))}<label class="check"><input type="checkbox" data-path="design.showSubtitle" ${d.showSubtitle?'checked':''}>サイト紹介文を表示</label><label class="check"><input type="checkbox" data-path="design.showMascot" ${d.showMascot?'checked':''}>マスコットを表示</label>${field('マスコットの位置','design.mascotPos',d.mascotPos,'select',[option('left','タイトルの左',d.mascotPos),option('right','タイトルの右',d.mascotPos)].join(''))}${field('マスコット幅(px)','design.mascotWidth',d.mascotWidth,'number','min="30" max="240"')}</div></div>`;
@@ -149,7 +162,7 @@ if(tab==='images')html=`<div class="form"><div class="group"><h3>マスコット
 <p class="help">PNG・JPEG・WebP・GIF（各3MB以下）。画像は書き出すファイルに埋め込まれます。</p>
 ${imageEditor('メイン画像','coverImage',data,'coverImage')}
 ${field('画像の代替テキスト','coverAlt',data.coverAlt)}
-${layoutEditor('メイン画像の位置','coverLayout',data.coverLayout||'top')}</div>
+${layoutEditor('メイン画像の位置','coverLayout',data.coverLayout||'top')}</div>${data.type!=='series'?bodyImagesEditor(data):''}
 ${data.type==='free'?`<div class="group"><h3>ギャラリー</h3>
 ${data.gallery.map((item,i)=>`<div class="group">${imageEditor(`ギャラリー画像 ${i+1}`,`gallery.${i}.image`,item,'image')}
 ${field('画像の代替テキスト',`gallery.${i}.alt`,item.alt)}
@@ -168,7 +181,7 @@ if(!String(data.pageTitle??'').trim()&&!String(data.body??'').trim()&&!safeImage
   setStatus('過去ログに移すコラムを入力してください');
   return;
 }
-data.entries.unshift({id:'note-'+Date.now(),date:data.date,title:data.pageTitle||'無題',body:data.body,image:data.coverImage,imageAlt:data.coverAlt,imageLayout:data.coverLayout||'top',imageWidth:data.coverWidth});data.date=today();data.pageTitle='';data.body='';data.coverImage='';data.coverAlt='';tab='main';selectTab('main');updatePreview();setStatus('前のコラムを過去ログへ移動しました');return;}if(a==='delete-entry'&&confirm('この過去記事を削除しますか？'))data.entries.splice(i,1);if(a==='add-section')data.sections.push({date:today(),title:'',body:''});if(a==='delete-section'&&confirm('この記事を削除しますか？'))data.sections.splice(i,1);if(a==='move-link'){
+data.entries.unshift({id:'note-'+Date.now(),date:data.date,title:data.pageTitle||'無題',body:data.body,image:data.coverImage,imageAlt:data.coverAlt,imageLayout:data.coverLayout||'top',imageWidth:data.coverWidth,bodyImages:data.bodyImages||[],bodyImageSequence:data.bodyImageSequence});data.bodyImages=[];data.bodyImageSequence=1;data.date=today();data.pageTitle='';data.body='';data.coverImage='';data.coverAlt='';tab='main';selectTab('main');updatePreview();setStatus('前のコラムを過去ログへ移動しました');return;}if(a==='delete-entry'&&confirm('この過去記事を削除しますか？'))data.entries.splice(i,1);if(a==='add-section')data.sections.push({date:today(),title:'',body:''});if(a==='delete-section'&&confirm('この記事を削除しますか？'))data.sections.splice(i,1);if(a==='move-link'){
   const direction=Number(el.dataset.direction);
   const target=i+direction;
   if(target<0||target>=data.links.length)return;
@@ -179,6 +192,15 @@ data.entries.unshift({id:'note-'+Date.now(),date:data.date,title:data.pageTitle|
   document.querySelector(`[data-action="move-link"][data-index="${target}"][data-direction="${focusDirection}"]`)?.focus();
   setStatus(`リンクを${target+1}番目に移動しました`);
   return;
+}
+if(a==='add-body-image'||a==='delete-body-image'){
+  const owner=el.dataset.owner?el.dataset.owner.split('.').reduce((obj,key)=>obj[key],data):data;
+  owner.bodyImages??=[];
+  if(a==='add-body-image'){
+    owner.bodyImageSequence=Math.max(Number(owner.bodyImageSequence)||1,...owner.bodyImages.map(item=>Number(/^img-(\d+)$/.exec(item.id)?.[1])||1))+1;
+    owner.bodyImages.push({id:'img-'+owner.bodyImageSequence,image:'',imageAlt:'',imageLayout:'inline',imageWidth:100});
+  }
+  else if(confirm('この画像枠を削除しますか？ 本文に残った挿入用コードは公開時に表示されません。'))owner.bodyImages.splice(i,1);
 }
 if(a==='add-link')data.links.push({title:'',url:'',description:''});if(a==='delete-link'&&confirm('このリンクを削除しますか？'))data.links.splice(i,1);if(a==='add-gallery')data.gallery.push({image:'',alt:'',caption:''});if(a==='delete-gallery'&&confirm('この画像枠を削除しますか？'))data.gallery.splice(i,1);
 if(a==='select-image'||a==='clear-image'){
@@ -217,7 +239,10 @@ for(const key of ['background','ink','accent','line']){
 .gallery-section{margin:30px 0}.gallery figure{margin:0}.gallery img{display:block;width:100%;aspect-ratio:4/3;object-fit:contain;border-radius:8px;border:1px solid ${d.line}}.gallery figcaption{font-size:.8em;margin-top:6px}
 
 @media(max-width:490px){.site{padding:20px 16px}.headline{gap:10px}.mascot,.mascot-fallback{width:min(${m}px,25vw)}.headline h2{font-size:1.22em}nav{gap:14px}}`;}
-const inlineText=text=>text.replaceAll('<!--more-->','').split('<!--image-->').map(part=>escapeHtml(part).replace(/\n/g,'<br>')).join('<span data-inline-image-slot></span>');
+const inlineText=text=>text.replaceAll('<!--more-->','').split(/(<!--image(?::[A-Za-z0-9-]+)?-->)/g).map(part=>{
+  const marker=/^<!--image(?::([A-Za-z0-9-]+))?-->$/.exec(part);
+  return marker?`<span data-inline-image-slot="${marker[1]||''}"></span>`:escapeHtml(part).replace(/\n/g,'<br>');
+}).join('');
 const paragraphs=s=>String(s||'').split(/\n\s*\n/).map(p=>`<p>${inlineText(p.trim())}</p>`).join('');
 function foldedParagraphs(text,splitAt){
   let offset=0;
@@ -288,19 +313,25 @@ function archiveLinks(months){
 function contentImage(image,alt,cssClass='column-image'){
   return safeImage(image)?`<img class="${cssClass}" src="${escapeHtml(image)}" alt="${escapeHtml(alt)}">`:'';
 }
-function imageContent(image,body,layout='top',width=100){
-  const slot='<span data-inline-image-slot></span>';
-  const clean=html=>html.replaceAll(slot,'');
-  if(!image)return clean(body);
-  const size=Math.max(10,Math.min(100,Number(width)||100));
-  image=image.replace('<img ',`<img style="width:${size}%;height:auto;margin-inline:0" `);
-  if(layout==='inline'){
-    if(body.includes(slot))return clean(body.replace(slot,image));
-    layout='bottom';
+function imageContent(image,body,layout='top',width=100,extras=[]){
+  const top=[],bottom=[];
+  const images=[{markup:image,layout,width,id:''},...extras.map(item=>({
+    markup:contentImage(item.image,item.imageAlt),layout:item.imageLayout,width:item.imageWidth,
+    id:/^[A-Za-z0-9-]+$/.test(item.id)?item.id:null
+  }))];
+  for(const item of images){
+    if(!item.markup||item.id===null)continue;
+    const size=Math.max(10,Math.min(100,Number(item.width)||100));
+    const markup=item.markup.replace('<img ',`<img style="width:${size}%;height:auto;margin-inline:0" `);
+    const slot=`<span data-inline-image-slot="${item.id}"></span>`;
+    if(item.layout==='inline'&&body.includes(slot)){
+      body=body.replace(slot,markup);
+    }else if(['bottom','right','inline'].includes(item.layout))bottom.push(markup);
+    else top.push(markup);
   }
-  if(!['top','bottom'].includes(layout))layout=layout==='right'?'bottom':'top';
-  body=clean(body);
-  return `<div class="image-content ${layout}">${layout==='bottom'?body+image:image+body}</div>`;
+  // Removed images and repeated markers must never expose editing codes.
+  body=body.replace(/<span data-inline-image-slot="[A-Za-z0-9-]*"><\/span>/g,'');
+  return top.length||bottom.length?`<div class="image-content">${top.join('')}${body}${bottom.join('')}</div>`:body;
 }
 function cornerLinks(){
   if(!data.showLinks)return '';
@@ -324,13 +355,13 @@ function seriesMarkup(heading,cover,links){
   const index=episodes.length?`<section class="series-index" aria-labelledby="series-index-title"><h2 class="sectiontitle" id="series-index-title">目次</h2><ol>${episodes.map(({entry,number})=>
     `<li><a href="#article-${number}">${escapeHtml(entry.title||'無題')}</a></li>`).join('')}</ol></section>`:'';
   const articles=episodes.map(({entry:e,number},index)=>`<article class="seriesitem" id="article-${number}"><p class="episode-number">第${number}回</p>${columnHeading(e.title,e.date)}
-    ${imageContent(contentImage(e.image,e.imageAlt),`<div class="bodytext">${index===0?featuredBody(e.body):paragraphs(e.body)}</div>`,e.imageLayout,e.imageWidth)}</article>`).join('');
+    ${imageContent(contentImage(e.image,e.imageAlt),`<div class="bodytext">${index===0?featuredBody(e.body):paragraphs(e.body)}</div>`,e.imageLayout,e.imageWidth,e.bodyImages)}</article>`).join('');
   return `${heading}${imageContent(cover,`<section aria-label="連載の記事">${articles||'<p>まだ記事がありません。</p>'}</section>`,data.coverLayout,data.coverWidth)}${index}${links?'<hr>'+links:''}`;
 }
 function freeMarkup(heading,cover,links){
   const figures=data.gallery.filter(item=>safeImage(item.image)).map(item=>
     `<figure>${contentImage(item.image,item.alt,'gallery-image')}${item.caption?`<figcaption>${escapeHtml(item.caption)}</figcaption>`:''}</figure>`).join('');
-  return `<article class="free-page">${heading}<div class="free-content">${imageContent(cover,`<div class="bodytext">${paragraphs(data.body)}</div>`,data.coverLayout||'top',data.coverWidth)}</div>
+  return `<article class="free-page">${heading}<div class="free-content">${imageContent(cover,`<div class="bodytext">${paragraphs(data.body)}</div>`,data.coverLayout||'top',data.coverWidth,data.bodyImages)}</div>
     ${figures?`<section class="gallery-section"><h3 class="sectiontitle">ギャラリー</h3><div class="gallery">${figures}</div></section>`:''}</article>${links?'<hr>'+links:''}`;
 }
 function siteMarkup(){
@@ -341,8 +372,8 @@ function siteMarkup(){
   const links=cornerLinks();
 let main='';if(data.type==='home'){
   const {recent,months}=splitColumns();
-  const logs=recent.map(e=>`<details class="archiveitem"><summary>${columnHeading(e.title,e.date,'')}</summary>${imageContent(contentImage(e.image,e.imageAlt),`<div class="bodytext">${paragraphs(e.body)}</div>`,e.imageLayout,e.imageWidth)}</details>`).join('');
-  main=`<article id="latest">${headline}${imageContent(cover,`<div class="bodytext">${featuredBody(data.body)}</div>`,data.coverLayout,data.coverWidth)}</article><hr><details class="archive" id="archive"><summary>過去のコラム（${recent.length}件）</summary>${logs||'<p>まだありません。</p>'}</details>${archiveLinks(months)}${links?'<hr>'+links:''}`;
+  const logs=recent.map(e=>`<details class="archiveitem"><summary>${columnHeading(e.title,e.date,'')}</summary>${imageContent(contentImage(e.image,e.imageAlt),`<div class="bodytext">${paragraphs(e.body)}</div>`,e.imageLayout,e.imageWidth,e.bodyImages)}</details>`).join('');
+  main=`<article id="latest">${headline}${imageContent(cover,`<div class="bodytext">${featuredBody(data.body)}</div>`,data.coverLayout,data.coverWidth,data.bodyImages)}</article><hr><details class="archive" id="archive"><summary>過去のコラム（${recent.length}件）</summary>${logs||'<p>まだありません。</p>'}</details>${archiveLinks(months)}${links?'<hr>'+links:''}`;
 }
 else if(data.type==='series')main=seriesMarkup(headline,cover,links);
 else main=freeMarkup(headline,cover,links);
@@ -364,7 +395,7 @@ function makeHtml(){
 function makeArchiveHtml(month,entries){
   const title=monthLabel(month)+'のコラム';
   const home='../'+encodeURIComponent(filename(data.fileName,'html'));
-  const articles=entries.map(e=>`<article class="seriesitem">${columnHeading(e.title,e.date,'h3')}${imageContent(contentImage(e.image,e.imageAlt),`<div class="bodytext">${paragraphs(e.body)}</div>`,e.imageLayout,e.imageWidth)}</article>`).join('');
+  const articles=entries.map(e=>`<article class="seriesitem">${columnHeading(e.title,e.date,'h3')}${imageContent(contentImage(e.image,e.imageAlt),`<div class="bodytext">${paragraphs(e.body)}</div>`,e.imageLayout,e.imageWidth,e.bodyImages)}</article>`).join('');
   return pageHtml(title+' | '+data.siteTitle,
     `<div class="site"><header><h1>${escapeHtml(data.siteTitle)}</h1></header><nav aria-label="ページ移動"><a href="${home}">トップページに戻る</a></nav><main><h2 class="sectiontitle">${title}</h2>${articles}</main></div>`);
 }
@@ -512,6 +543,8 @@ function validate(x){
   return x&&x.version===1&&['home','series','free'].includes(x.type)
     &&x.design&&typeof x.design==='object'&&typeof x.siteTitle==='string'
     &&(x.fileName===undefined||typeof x.fileName==='string')
+    &&[x,...(Array.isArray(x.entries)?x.entries:[]),...(Array.isArray(x.sections)?x.sections:[])].every(owner=>owner&&
+      (owner.bodyImages===undefined||(Array.isArray(owner.bodyImages)&&owner.bodyImages.every(item=>item&&typeof item==='object'&&typeof item.id==='string'&&/^[A-Za-z0-9-]+$/.test(item.id)))))
     &&[x.entries,x.links,x.sections,...(x.gallery===undefined?[]:[x.gallery])].every(list=>Array.isArray(list)
       &&list.every(row=>row&&typeof row==='object'&&!Array.isArray(row)));
 }
