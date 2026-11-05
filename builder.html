@@ -125,10 +125,10 @@ ${data.type==='series'?field('連載記事の表示順','seriesOrder',data.serie
   option('newest','日付の新しい順',data.seriesOrder)
 ].join('')):''}${data.type!=='home'?field(data.type==='series'?'連載ページの題名':'自由ページの題名','pageTitle',data.pageTitle):''}
 ${field('ブラウザのタブに表示するタイトル','browserTitle',data.browserTitle)}
-<p class="help">空欄の場合は題名やサイト名から自動で表示します。</p>${data.type==='home'?`${field('最新コラムの日付','date',data.date,'date')}${field('最新コラムのタイトル','pageTitle',data.pageTitle)}`:''}${data.type==='series'?'<p class="help">各回のタイトルや本文は「記事・リンク」で編集します。</p>':`${field(data.type==='home'?'最新コラム本文':'ページ本文','body',data.body,'textarea')}<p class="help">改行はそのまま反映します。HTMLタグではなく通常の文章を入力してください。</p>`}</div>`;
+<p class="help">空欄の場合は題名やサイト名から自動で表示します。</p>${data.type==='home'?`${field('最新コラムの日付','date',data.date,'date')}${field('最新コラムのタイトル','pageTitle',data.pageTitle)}`:''}${data.type==='series'?'<p class="help">各回のタイトルや本文は「記事・リンク」で編集します。</p>':`${field(data.type==='home'?'最新コラム本文':'ページ本文','body',data.body,'textarea')}<p class="help">改行はそのまま反映します。通常の文章を入力してください。折りたたみは144字以降の文末・段落が目安です。好きな位置で区切るには &lt;!--more--&gt; を入れてください（公開ページには表示されません）。</p>`}</div>`;
 if(tab==='articles'){
 if(data.type==='home')html=`<div class="form"><div class="group"><h3>過去のコラム</h3><p class="help">公開時は日付の新しい順に10本までトップに表示し、残りはアーカイブに掲載します。すべての原稿をここで編集できます。</p><div id="entryList">${data.entries.map((e,i)=>`<div class="group"><div class="split">${field('日付',`entries.${i}.date`,e.date,'date')}${field('タイトル',`entries.${i}.title`,e.title)}</div>${field('本文',`entries.${i}.body`,e.body,'textarea')}${imageEditor('記事の画像',`entries.${i}.image`,e,'image')}${field('画像の代替テキスト',`entries.${i}.imageAlt`,e.imageAlt)}<button class="btn warn" data-action="delete-entry" data-index="${i}">この過去記事を削除</button></div>`).join('')}</div><div class="tools"><button class="btn" data-action="add-entry">＋ 過去記事を追加</button><button class="btn" data-action="archive-latest">最新コラムを過去ログに移す</button></div></div>${linkEditor()}</div>`;
-else if(data.type==='series')html=`<div class="form"><div class="group"><h3>連載の記事</h3>${data.sections.map((e,i)=>`<div class="group"><div class="split">${field('記事タイトル',`sections.${i}.title`,e.title)}${field('日付',`sections.${i}.date`,e.date,'date')}</div>${field('本文',`sections.${i}.body`,e.body,'textarea')}${imageEditor('記事の画像',`sections.${i}.image`,e,'image')}${field('画像の代替テキスト',`sections.${i}.imageAlt`,e.imageAlt)}<button class="btn warn" data-action="delete-section" data-index="${i}">この記事を削除</button></div>`).join('')}<button class="btn" data-action="add-section">＋ 連載記事を追加</button></div>${linkEditor()}</div>`;
+else if(data.type==='series')html=`<div class="form"><div class="group"><h3>連載の記事</h3>${data.sections.map((e,i)=>`<div class="group"><div class="split">${field('記事タイトル',`sections.${i}.title`,e.title)}${field('日付',`sections.${i}.date`,e.date,'date')}</div>${field('本文',`sections.${i}.body`,e.body,'textarea')}<p class="help">先頭記事は144字以降の文末・段落で折りたたみます。&lt;!--more--&gt; で位置を指定できます。</p>${imageEditor('記事の画像',`sections.${i}.image`,e,'image')}${field('画像の代替テキスト',`sections.${i}.imageAlt`,e.imageAlt)}<button class="btn warn" data-action="delete-section" data-index="${i}">この記事を削除</button></div>`).join('')}<button class="btn" data-action="add-section">＋ 連載記事を追加</button></div>${linkEditor()}</div>`;
 else html=`<div class="form">${linkEditor()}</div>`;
 }
 if(tab==='design')html=`<div class="form"><div class="group"><h3>文字・色</h3><div class="split">${field('背景色','design.background',d.background,'color')}${field('文字色','design.ink',d.ink,'color')}${field('リンク色','design.accent',d.accent,'color')}${field('区切り線','design.line',d.line,'color')}</div><div class="split">${field('本文文字サイズ(px)','design.fontSize',d.fontSize,'number','min="12" max="26"')}${field('行間','design.lineHeight',d.lineHeight,'number','min="1.2" max="2.6" step="0.1"')}${field('本文最大幅(px)','design.maxWidth',d.maxWidth,'number','min="400" max="1200"')}</div></div><div class="group"><h3>見出し・表示</h3>${field('日付の表示','design.titleDate',d.titleDate,'select',[option('above','タイトルの上',d.titleDate),option('inline','タイトルの前に表示',d.titleDate),option('none','表示しない',d.titleDate)].join(''))}<label class="check"><input type="checkbox" data-path="design.showSubtitle" ${d.showSubtitle?'checked':''}>サイト紹介文を表示</label><label class="check"><input type="checkbox" data-path="design.showMascot" ${d.showMascot?'checked':''}>マスコットを表示</label>${field('マスコットの位置','design.mascotPos',d.mascotPos,'select',[option('left','タイトルの左',d.mascotPos),option('right','タイトルの右',d.mascotPos)].join(''))}${field('マスコット幅(px)','design.mascotWidth',d.mascotWidth,'number','min="30" max="240"')}</div></div>`;
@@ -207,7 +207,7 @@ for(const key of ['background','ink','accent','line']){
 .gallery-section{margin:30px 0}.gallery figure{margin:0}.gallery img{display:block;width:100%;aspect-ratio:4/3;object-fit:contain;border-radius:8px;border:1px solid ${d.line}}.gallery figcaption{font-size:.8em;margin-top:6px}
 @media(max-width:600px){.free-content.with-side-cover{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:490px){.site{padding:20px 16px}.headline{gap:10px}.mascot,.mascot-fallback{width:min(${m}px,25vw)}.headline h2{font-size:1.22em}nav{gap:14px}}`;}
-const inlineText=text=>escapeHtml(text).replace(/\n/g,'<br>');
+const inlineText=text=>escapeHtml(text.replaceAll('<!--more-->','')).replace(/\n/g,'<br>');
 const paragraphs=s=>String(s||'').split(/\n\s*\n/).map(p=>`<p>${inlineText(p.trim())}</p>`).join('');
 function foldedParagraphs(text,splitAt){
   let offset=0;
@@ -221,17 +221,25 @@ function foldedParagraphs(text,splitAt){
   }).join('');
 }
 function featuredBody(body){
-  const text=String(body??'').replace(/\r\n?/g,'\n').trim();
-  const limit=144;
-  const earliestBreak=96;
-  // Measure by Unicode code point so a cut cannot split a surrogate pair.
-  const characters=Array.from(text);
-  if(characters.length<=limit)return paragraphs(text);
-  const prefix=characters.slice(0,earliestBreak).join('');
-  const window=characters.slice(earliestBreak,limit).join('');
-  const boundary=[...window.matchAll(/\n[^\S\n]*\n/g)].at(-1)
-    ??[...window.matchAll(/[。！？]+[」』】）”’]*|[.!?]+(?=\s)/g)].at(-1);
-  const splitAt=boundary?prefix.length+boundary.index+boundary[0].length:prefix.length+window.length;
+  const source=String(body??'').replace(/\r\n?/g,'\n').trim();
+  const marker='<!--more-->';
+  const manualAt=source.indexOf(marker);
+  const text=source.replaceAll(marker,'');
+  let splitAt;
+  if(manualAt>=0){
+    splitAt=manualAt;
+  }else{
+    // Measure the target by Unicode code point, then extend to a complete sentence
+    // or paragraph. With no later boundary, keep the whole text visible.
+    const characters=Array.from(text);
+    if(characters.length<=144)return paragraphs(text);
+    const target=characters.slice(0,144).join('').length;
+    const boundary=[...text.matchAll(/\n[^\S\n]*\n|[。！？]+[」』】）”’]*|[.!?]+(?=\s|$)/g)]
+      .find(match=>match.index+match[0].length>=target);
+    if(!boundary)return paragraphs(text);
+    splitAt=boundary.index+boundary[0].length;
+  }
+  if(!text.slice(splitAt).trim())return paragraphs(text);
   return `<div class="featured-body"><div id="featured-copy">${foldedParagraphs(text,splitAt)}</div><details class="continuation"><summary aria-controls="featured-copy"><span class="when-closed">続きを読む</span><span class="when-open">続きを閉じる</span></summary></details></div>`;
 }
 function columnHeading(title,date,tag='h2'){
