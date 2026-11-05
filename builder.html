@@ -74,6 +74,13 @@
 <section class="group hidden" id="archiveExport" tabindex="-1" aria-label="アーカイブの書き出し"></section><div class="tabs" role="tablist"><button class="tab active" data-tab="main">ページ</button><button class="tab" data-tab="articles">記事・リンク</button><button class="tab" data-tab="design">デザイン</button><button class="tab" data-tab="images">画像</button></div><div id="editorContent"></div><details class="helpbox"><summary>使い方・注意点</summary><p>①ページを編集 ②プレビューで確認 ③共有コードまたはJSONを保存（次回編集用） ④HTMLを書き出す（GitHubにアップロード用）。HTMLには再編集用データも埋め込みます。本ビルダー製のHTMLのみ再読込に対応します。一般のHTMLを自動解析するものではありません。</p><p>トップページの過去コラムは直近10本までです。「アーカイブ作成」で残りを月別に書き出せます。公開時はトップページと月別HTMLを同じ編集状態から書き出してください。</p><p>画像はHTMLに埋め込めますが、重い画像はファイルサイズが大きくなります。自作アプリへのリンクは、GitHub上の配置に合わせて相対URLを設定してください。ブラウザによって保存先の操作が異なります。アップロードはご自身で行ってください。</p></details></div></section>
 <section class="panel"><div class="panelhead"><strong>完成ページのプレビュー</strong><div class="device"><button class="btn" id="desktopBtn" aria-pressed="true">PC</button><button class="btn" id="mobileBtn" aria-pressed="false">スマホ</button><button class="btn" id="openPreviewBtn">別画面</button></div></div><div class="previewArea"><iframe class="frame" id="preview" title="ホームページのプレビュー" sandbox="allow-same-origin"></iframe></div></section></main>
 <footer>ファイルは端末上で処理します。サーバーへの送信・ログインはありません。</footer>
+<dialog id="linkDialog" class="file-menu" aria-labelledby="linkDialogTitle"><form id="linkForm" class="file-menu-content">
+<h2 id="linkDialogTitle">本文にリンクを挿入</h2>
+<div class="field"><label for="linkLabel">表示する文字</label><input id="linkLabel" required></div>
+<div class="field"><label for="linkDestination">リンク先</label><input id="linkDestination" placeholder="https://example.com/" required></div>
+<p id="linkError" class="help" role="status"></p>
+<div class="tools"><button class="btn primary" type="submit">挿入</button><button class="btn" id="cancelLink" type="button">キャンセル</button></div>
+</form></dialog>
 <input class="hidden" id="fileJson" type="file" accept=".json,application/json"><input class="hidden" id="fileHtml" type="file" accept=".html,.htm,text/html"><input class="hidden" id="fileImage" type="file" accept="image/png,image/jpeg,image/webp,image/gif"><script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id);const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const safeUrl=s=>{s=String(s||'').trim();if(!s||/[\\\u0000-\u001f\u007f]/.test(s))return '#';if(/^(https?:\/\/|\.\.?\/|\/[^/]|#|[\w.-]+(?:\/[\w.\-]+)*\.(?:html?|pdf)(?:[?#].*)?$)/i.test(s) && !s.startsWith('//'))return s;return '#'};
@@ -109,8 +116,32 @@ function travelHistory(direction){
 $('undoBtn').onclick=()=>travelHistory(-1);
 $('redoBtn').onclick=()=>travelHistory(1);
 const setStatus=s=>{$('status').textContent=s};
-const field=(label,path,value,kind='text',extra='')=>`<div class="field"><label for="${path}">${escapeHtml(label)}</label>${kind==='textarea'?`<textarea id="${path}" data-path="${path}" rows="5">${escapeHtml(value)}</textarea>`:kind==='select'?`<select id="${path}" data-path="${path}">${extra}</select>`:`<input id="${path}" data-path="${path}" type="${kind}" value="${escapeHtml(value)}" ${extra}>`}</div>`;
+const field=(label,path,value,kind='text',extra='')=>`<div class="field"><label for="${path}">${escapeHtml(label)}</label>${kind==='textarea'?`<textarea id="${path}" data-path="${path}" rows="5">${escapeHtml(value)}</textarea>${/(^|\.)body$/.test(path)?`<button class="btn" type="button" data-link-target="${path}">リンクを挿入</button><p class="help">文字を選んでリンクを挿入できます。[表示する文字](https://example.com/) と直接書くこともできます。</p>`:''}`:kind==='select'?`<select id="${path}" data-path="${path}">${extra}</select>`:`<input id="${path}" data-path="${path}" type="${kind}" value="${escapeHtml(value)}" ${extra}>`}</div>`;
 const option=(v,t,cur)=>`<option value="${escapeHtml(v)}" ${String(v)===String(cur)?'selected':''}>${escapeHtml(t)}</option>`;
+let linkRequest=null;
+function openLinkDialog(target){
+  linkRequest={target,page:data,start:target.selectionStart,end:target.selectionEnd};
+  $('linkLabel').value=target.value.slice(linkRequest.start,linkRequest.end);
+  $('linkDestination').value='';$('linkError').textContent='';
+  $('linkDialog').showModal();
+  ($('linkLabel').value?$('linkDestination'):$('linkLabel')).focus();
+}
+$('cancelLink').onclick=()=>$('linkDialog').close();
+$('linkDialog').addEventListener('close',()=>{linkRequest?.target.focus();linkRequest=null;});
+$('linkForm').onsubmit=event=>{
+  event.preventDefault();
+  const request=linkRequest,label=$('linkLabel').value.trim();
+  const url=$('linkDestination').value.trim().replace(/\(/g,'%28').replace(/\)/g,'%29').replace(/ /g,'%20');
+  if(!label||/[\r\n]/.test(label)||!url||(safeUrl(url)==='#'&&url!=='#')){
+    $('linkError').textContent='表示する文字と、https:// から始まるURL・相対URL・ページ内リンクを指定してください。';return;
+  }
+  if(!request||request.page!==data||!request.target.isConnected){$('linkDialog').close();return;}
+  const escaped=Array.from(label,c=>['[',']',String.fromCharCode(92)].includes(c)?String.fromCharCode(92)+c:c).join('');
+  request.target.setRangeText(`[${escaped}](${url})`,request.start,request.end,'end');
+  lastHistoryPath=null;
+  request.target.dispatchEvent(new Event('input',{bubbles:true}));
+  $('linkDialog').close();setStatus('リンクを挿入しました');
+};
 function layoutEditor(label,path,value='top'){
   if(!['top','bottom','inline'].includes(value))value=value==='right'?'bottom':'top';
   const widthPath=path.replace(/Layout$/,'Width');
@@ -176,7 +207,7 @@ function linkEditor(){return `<div class="group"><h3>リンク一覧</h3><label 
   <button class="btn warn" data-action="delete-link" data-index="${i}">削除</button>
 </div></div>`).join('')}<button class="btn" data-action="add-link">＋ リンクを追加</button></div>`}
 function updateByPath(path,value){historyPath=path;const parts=path.split('.');let obj=data;for(let i=0;i<parts.length-1;i++){obj=obj[parts[i]];}obj[parts.at(-1)]=value;if(path==='type'){let t=value;data.type=t;data.fileName=t==='home'?'index.html':t==='series'?'series.html':'page.html';renderEditor();}updatePreview();historyPath=null;setStatus('編集中')}
-function bindEditor(){document.querySelectorAll('[data-path]').forEach(el=>{const evt=el.type==='checkbox'||el.type==='color'||el.tagName==='SELECT'||el.type==='date'?'change':'input';el.addEventListener(evt,()=>{let v=el.type==='checkbox'?el.checked:el.value;if(el.type==='number')v=Number(v);updateByPath(el.dataset.path,v);});});document.querySelectorAll('[data-action]').forEach(el=>el.addEventListener('click',()=>{const a=el.dataset.action,i=Number(el.dataset.index);if(a==='add-entry')data.entries.unshift({id:'note-'+Date.now(),date:today(),title:'',body:''});if(a==='archive-latest'){
+function bindEditor(){document.querySelectorAll('[data-link-target]').forEach(button=>button.onclick=()=>openLinkDialog($(button.dataset.linkTarget)));document.querySelectorAll('[data-path]').forEach(el=>{const evt=el.type==='checkbox'||el.type==='color'||el.tagName==='SELECT'||el.type==='date'?'change':'input';el.addEventListener(evt,()=>{let v=el.type==='checkbox'?el.checked:el.value;if(el.type==='number')v=Number(v);updateByPath(el.dataset.path,v);});});document.querySelectorAll('[data-action]').forEach(el=>el.addEventListener('click',()=>{const a=el.dataset.action,i=Number(el.dataset.index);if(a==='add-entry')data.entries.unshift({id:'note-'+Date.now(),date:today(),title:'',body:''});if(a==='archive-latest'){
 if(!String(data.pageTitle??'').trim()&&!String(data.body??'').trim()&&!safeImage(data.coverImage)){
   setStatus('過去ログに移すコラムを入力してください');
   return;
@@ -239,9 +270,20 @@ for(const key of ['background','ink','accent','line']){
 .gallery-section{margin:30px 0}.gallery figure{margin:0}.gallery img{display:block;width:100%;aspect-ratio:4/3;object-fit:contain;border-radius:8px;border:1px solid ${d.line}}.gallery figcaption{font-size:.8em;margin-top:6px}
 
 @media(max-width:490px){.site{padding:20px 16px}.headline{gap:10px}.mascot,.mascot-fallback{width:min(${m}px,25vw)}.headline h2{font-size:1.22em}nav{gap:14px}}`;}
+const linkPattern=()=>/\[((?:\\.|[^\]\\\n])+)\]\(([^()\s]+)\)/g;
+function linkedText(text){
+  let html='',offset=0;
+  for(const match of text.matchAll(linkPattern())){
+    html+=escapeHtml(text.slice(offset,match.index));
+    const url=safeUrl(match[2]);
+    html+=url==='#'&&match[2]!=='#'?escapeHtml(match[0]):`<a href="${escapeHtml(url)}">${escapeHtml(match[1].replace(/\\(.)/g,'$1'))}</a>`;
+    offset=match.index+match[0].length;
+  }
+  return (html+escapeHtml(text.slice(offset))).replace(/\n/g,'<br>');
+}
 const inlineText=text=>text.replaceAll('<!--more-->','').split(/(<!--image(?::[A-Za-z0-9-]+)?-->)/g).map(part=>{
   const marker=/^<!--image(?::([A-Za-z0-9-]+))?-->$/.exec(part);
-  return marker?`<span data-inline-image-slot="${marker[1]||''}"></span>`:escapeHtml(part).replace(/\n/g,'<br>');
+  return marker?`<span data-inline-image-slot="${marker[1]||''}"></span>`:linkedText(part);
 }).join('');
 const paragraphs=s=>String(s||'').split(/\n\s*\n/).map(p=>`<p>${inlineText(p.trim())}</p>`).join('');
 function foldedParagraphs(text,splitAt){
@@ -269,8 +311,9 @@ function featuredBody(body){
     const characters=Array.from(text);
     if(characters.length<=144)return paragraphs(text);
     const target=characters.slice(0,144).join('').length;
+    const links=[...text.matchAll(linkPattern())];
     const boundary=[...text.matchAll(/\n[^\S\n]*\n|[。！？]+[」』】）”’]*|[.!?]+(?=\s|$)/g)]
-      .find(match=>match.index+match[0].length>=target);
+      .find(match=>{const end=match.index+match[0].length;return end>=target&&!links.some(link=>end>link.index&&end<link.index+link[0].length);});
     if(!boundary)return paragraphs(text);
     splitAt=boundary.index+boundary[0].length;
   }
