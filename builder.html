@@ -293,7 +293,7 @@ function imageContent(image,body,layout='top',width=100){
   const clean=html=>html.replaceAll(slot,'');
   if(!image)return clean(body);
   const size=Math.max(10,Math.min(100,Number(width)||100));
-  image=image.replace('<img ',`<img style="width:${size}%;height:auto;margin-inline:auto" `);
+  image=image.replace('<img ',`<img style="width:${size}%;height:auto;margin-inline:0" `);
   if(layout==='inline'){
     if(body.includes(slot))return clean(body.replace(slot,image));
     layout='bottom';
