@@ -3,7 +3,7 @@
 <style>
 :root{font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;color:#28332d;background:#eaece7;font-synthesis:none}*{box-sizing:border-box}body{margin:0}button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}header{background:#203e35;color:white;padding:16px clamp(14px,3vw,30px);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}header h1{font-size:19px;margin:0}header p{font-size:12px;margin:4px 0 0;color:#d4e7dd}.main{max-width:1370px;margin:auto;padding:16px;display:grid;grid-template-columns:minmax(300px,510px) minmax(0,1fr);gap:16px}.panel{background:#fff;border:1px solid #d9e0dc;border-radius:13px;box-shadow:0 3px 13px #203e3510;overflow:hidden}.panelhead{padding:14px 16px;border-bottom:1px solid #e8ece9;display:flex;justify-content:space-between;align-items:center;gap:9px}.panelhead strong{font-size:15px}.inside{padding:15px}.tools{display:flex;flex-wrap:wrap;gap:7px}.btn{border:1px solid #b6c7be;background:#fff;border-radius:8px;padding:9px 11px;font-size:13px;color:#234435;min-height:39px}.btn.primary{background:#28634c;color:white;border-color:#28634c}.btn.warn{color:#a24031;border-color:#e1b7b1}.btn:hover{filter:brightness(.96)}.tabs{display:flex;gap:5px;background:#f1f4f0;padding:5px;border-radius:10px;overflow:auto}.tab{border:0;background:transparent;border-radius:7px;padding:10px 13px;white-space:nowrap;font-size:13px}.tab.active{background:#fff;box-shadow:0 1px 5px #0001;font-weight:700;color:#22543f}.form{display:grid;gap:13px;margin-top:15px}.field{display:grid;gap:5px}.field label,.group-title{font-size:13px;font-weight:700}.help{font-size:12px;color:#60736a;margin:0;line-height:1.6}.field input,.field textarea,.field select{width:100%;border:1px solid #bccac1;border-radius:8px;background:white;padding:10px;color:#29372e;min-height:41px}.field textarea{resize:vertical;min-height:100px;line-height:1.7}.check{display:flex;align-items:center;gap:8px;font-size:13px}.check input{width:17px;height:17px;accent-color:#28634c}.split{display:grid;grid-template-columns:1fr 1fr;gap:10px}.group{padding:14px;background:#f8faf8;border:1px solid #e0e7df;border-radius:10px;display:grid;gap:11px}.group h3{margin:0;font-size:14px}.listrow{display:flex;align-items:center;gap:6px}.listrow input{min-width:0;flex:1}.listrow button{flex:none}.status{font-size:12px;color:#41624f;padding:8px 12px;background:#f0f7f0;border-radius:8px}.previewArea{padding:15px;background:#e5e8e4}.device{display:flex;gap:6px;align-items:center}.frame{width:100%;height:710px;border:1px solid #bac8bf;border-radius:9px;background:#fff}.frame.mobile{max-width:390px;margin:auto;display:block}.small{font-size:12px;color:#69756d}.muted{color:#65736a}details.helpbox{border:1px solid #dce4dd;border-radius:9px;margin-top:12px;padding:10px;background:#fbfcfb}details.helpbox summary{cursor:pointer;font-size:13px;font-weight:700}details.helpbox p{font-size:12px;line-height:1.75}.dropzone{border:1px dashed #a2b4a8;border-radius:9px;background:#f8faf8;padding:10px}a{color:#1f6549}.imagecheck{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.imagecheck img{width:62px;height:62px;object-fit:contain;background:#eef0eb;border:1px solid #dce2da;border-radius:8px}footer{text-align:center;color:#66736b;font-size:12px;padding:15px}.hidden{display:none!important}@media(max-width:900px){.main{grid-template-columns:1fr}.frame{height:630px}}@media(max-width:520px){.main{padding:8px;gap:8px}.inside{padding:11px}.panelhead{padding:12px}.split{grid-template-columns:1fr}.tools{gap:5px}.btn{padding:8px 9px}.previewArea{padding:8px}header{padding:13px}}
 
-#archiveExport,#textCodePanel{margin-bottom:12px}#textCode{font-family:ui-monospace,monospace}.archive-files{list-style:none;margin:0;padding:0;display:grid;gap:7px}.archive-files .btn{width:100%;text-align:left}.imagecheck .help{flex-basis:100%}.device{flex-wrap:wrap}.panelhead{flex-wrap:wrap}
+#archiveExport,#textCodePanel{margin-bottom:12px}#textCode{font-family:ui-monospace,monospace}.archive-files{list-style:none;margin:0;padding:0;display:grid;gap:7px}.archive-files .btn{width:100%;text-align:left}.imagecheck .help,.imagecheck .field{flex-basis:100%}.device{flex-wrap:wrap}.panelhead{flex-wrap:wrap}
 .toolbar{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px}
 .toolbar-group{display:grid;gap:5px;padding:7px 9px;background:#ffffff0d;border:1px solid #ffffff38;border-radius:9px}
 .toolbar-label{font-size:11px;font-weight:700;color:#e1eee8}
@@ -111,9 +111,18 @@ $('redoBtn').onclick=()=>travelHistory(1);
 const setStatus=s=>{$('status').textContent=s};
 const field=(label,path,value,kind='text',extra='')=>`<div class="field"><label for="${path}">${escapeHtml(label)}</label>${kind==='textarea'?`<textarea id="${path}" data-path="${path}" rows="5">${escapeHtml(value)}</textarea>`:kind==='select'?`<select id="${path}" data-path="${path}">${extra}</select>`:`<input id="${path}" data-path="${path}" type="${kind}" value="${escapeHtml(value)}" ${extra}>`}</div>`;
 const option=(v,t,cur)=>`<option value="${escapeHtml(v)}" ${String(v)===String(cur)?'selected':''}>${escapeHtml(t)}</option>`;
+function layoutEditor(label,path,value='top'){
+  if(value==='side')value='left';
+  return field(label,path,value,'select',[
+    option('top','本文の上',value),option('bottom','本文の下',value),
+    option('left','本文の左（スマホでは上）',value),option('right','本文の右（スマホでは下）',value)
+  ].join(''));
+}
 function imageEditor(label,path,item,key){
   const image=safeImage(item[key]);
   return `<div class="imagecheck"><strong class="small">${label}</strong>${image?`<img src="${escapeHtml(image)}" alt="">`:''}
+    ${field('読み込み形式',path+'Format',item[key+'Format']||'original','select',[option('original','元の形式を保持',item[key+'Format']||'original'),option('webp','WebPに変換',item[key+'Format'])].join(''))}
+    ${field('WebP画質',path+'Quality',item[key+'Quality']||'0.85','select',[option('0.7','軽量（70%）',String(item[key+'Quality']||'0.85')),option('0.85','標準（85%）',String(item[key+'Quality']||'0.85')),option('0.95','高画質（95%）',String(item[key+'Quality']||'0.85'))].join(''))}<p class="help">設定は次に選ぶ画像に適用します。WebP変換ではGIFなどのアニメーションは静止画になります。</p>
     <button class="btn" data-action="select-image" data-image-path="${path}" aria-label="${label}を選ぶ">画像を選ぶ</button>
     ${image?`<button class="btn warn" data-action="clear-image" data-image-path="${path}" aria-label="${label}を外す">外す</button>`:''}</div>`;
 }
@@ -127,8 +136,8 @@ ${data.type==='series'?field('連載記事の表示順','seriesOrder',data.serie
 ${field('ブラウザのタブに表示するタイトル','browserTitle',data.browserTitle)}
 <p class="help">空欄の場合は題名やサイト名から自動で表示します。</p>${data.type==='home'?`${field('最新コラムの日付','date',data.date,'date')}${field('最新コラムのタイトル','pageTitle',data.pageTitle)}`:''}${data.type==='series'?'<p class="help">各回のタイトルや本文は「記事・リンク」で編集します。</p>':`${field(data.type==='home'?'最新コラム本文':'ページ本文','body',data.body,'textarea')}<p class="help">改行はそのまま反映します。通常の文章を入力してください。折りたたみは144字以降の文末・段落が目安です。好きな位置で区切るには &lt;!--more--&gt; を入れてください（公開ページには表示されません）。</p>`}</div>`;
 if(tab==='articles'){
-if(data.type==='home')html=`<div class="form"><div class="group"><h3>過去のコラム</h3><p class="help">公開時は日付の新しい順に10本までトップに表示し、残りはアーカイブに掲載します。すべての原稿をここで編集できます。</p><div id="entryList">${data.entries.map((e,i)=>`<div class="group"><div class="split">${field('日付',`entries.${i}.date`,e.date,'date')}${field('タイトル',`entries.${i}.title`,e.title)}</div>${field('本文',`entries.${i}.body`,e.body,'textarea')}${imageEditor('記事の画像',`entries.${i}.image`,e,'image')}${field('画像の代替テキスト',`entries.${i}.imageAlt`,e.imageAlt)}<button class="btn warn" data-action="delete-entry" data-index="${i}">この過去記事を削除</button></div>`).join('')}</div><div class="tools"><button class="btn" data-action="add-entry">＋ 過去記事を追加</button><button class="btn" data-action="archive-latest">最新コラムを過去ログに移す</button></div></div>${linkEditor()}</div>`;
-else if(data.type==='series')html=`<div class="form"><div class="group"><h3>連載の記事</h3>${data.sections.map((e,i)=>`<div class="group"><div class="split">${field('記事タイトル',`sections.${i}.title`,e.title)}${field('日付',`sections.${i}.date`,e.date,'date')}</div>${field('本文',`sections.${i}.body`,e.body,'textarea')}<p class="help">先頭記事は144字以降の文末・段落で折りたたみます。&lt;!--more--&gt; で位置を指定できます。</p>${imageEditor('記事の画像',`sections.${i}.image`,e,'image')}${field('画像の代替テキスト',`sections.${i}.imageAlt`,e.imageAlt)}<button class="btn warn" data-action="delete-section" data-index="${i}">この記事を削除</button></div>`).join('')}<button class="btn" data-action="add-section">＋ 連載記事を追加</button></div>${linkEditor()}</div>`;
+if(data.type==='home')html=`<div class="form"><div class="group"><h3>過去のコラム</h3><p class="help">公開時は日付の新しい順に10本までトップに表示し、残りはアーカイブに掲載します。すべての原稿をここで編集できます。</p><div id="entryList">${data.entries.map((e,i)=>`<div class="group"><div class="split">${field('日付',`entries.${i}.date`,e.date,'date')}${field('タイトル',`entries.${i}.title`,e.title)}</div>${field('本文',`entries.${i}.body`,e.body,'textarea')}${imageEditor('記事の画像',`entries.${i}.image`,e,'image')}${field('画像の代替テキスト',`entries.${i}.imageAlt`,e.imageAlt)}${layoutEditor('記事画像の位置',`entries.${i}.imageLayout`,e.imageLayout)}<button class="btn warn" data-action="delete-entry" data-index="${i}">この過去記事を削除</button></div>`).join('')}</div><div class="tools"><button class="btn" data-action="add-entry">＋ 過去記事を追加</button><button class="btn" data-action="archive-latest">最新コラムを過去ログに移す</button></div></div>${linkEditor()}</div>`;
+else if(data.type==='series')html=`<div class="form"><div class="group"><h3>連載の記事</h3>${data.sections.map((e,i)=>`<div class="group"><div class="split">${field('記事タイトル',`sections.${i}.title`,e.title)}${field('日付',`sections.${i}.date`,e.date,'date')}</div>${field('本文',`sections.${i}.body`,e.body,'textarea')}<p class="help">先頭記事は144字以降の文末・段落で折りたたみます。&lt;!--more--&gt; で位置を指定できます。</p>${imageEditor('記事の画像',`sections.${i}.image`,e,'image')}${field('画像の代替テキスト',`sections.${i}.imageAlt`,e.imageAlt)}${layoutEditor('記事画像の位置',`sections.${i}.imageLayout`,e.imageLayout)}<button class="btn warn" data-action="delete-section" data-index="${i}">この記事を削除</button></div>`).join('')}<button class="btn" data-action="add-section">＋ 連載記事を追加</button></div>${linkEditor()}</div>`;
 else html=`<div class="form">${linkEditor()}</div>`;
 }
 if(tab==='design')html=`<div class="form"><div class="group"><h3>文字・色</h3><div class="split">${field('背景色','design.background',d.background,'color')}${field('文字色','design.ink',d.ink,'color')}${field('リンク色','design.accent',d.accent,'color')}${field('区切り線','design.line',d.line,'color')}</div><div class="split">${field('本文文字サイズ(px)','design.fontSize',d.fontSize,'number','min="12" max="26"')}${field('行間','design.lineHeight',d.lineHeight,'number','min="1.2" max="2.6" step="0.1"')}${field('本文最大幅(px)','design.maxWidth',d.maxWidth,'number','min="400" max="1200"')}</div></div><div class="group"><h3>見出し・表示</h3>${field('日付の表示','design.titleDate',d.titleDate,'select',[option('above','タイトルの上',d.titleDate),option('inline','タイトルの前に表示',d.titleDate),option('none','表示しない',d.titleDate)].join(''))}<label class="check"><input type="checkbox" data-path="design.showSubtitle" ${d.showSubtitle?'checked':''}>サイト紹介文を表示</label><label class="check"><input type="checkbox" data-path="design.showMascot" ${d.showMascot?'checked':''}>マスコットを表示</label>${field('マスコットの位置','design.mascotPos',d.mascotPos,'select',[option('left','タイトルの左',d.mascotPos),option('right','タイトルの右',d.mascotPos)].join(''))}${field('マスコット幅(px)','design.mascotWidth',d.mascotWidth,'number','min="30" max="240"')}</div></div>`;
@@ -137,10 +146,7 @@ if(tab==='images')html=`<div class="form"><div class="group"><h3>マスコット
 <p class="help">PNG・JPEG・WebP・GIF（各3MB以下）。画像は書き出すファイルに埋め込まれます。</p>
 ${imageEditor('メイン画像','coverImage',data,'coverImage')}
 ${field('画像の代替テキスト','coverAlt',data.coverAlt)}
-${data.type==='free'?field('メイン画像の位置','coverLayout',data.coverLayout||'side','select',[
-  option('side','本文の横（スマホでは上）',data.coverLayout||'side'),
-  option('top','本文の上',data.coverLayout)
-].join('')):''}</div>
+${layoutEditor('メイン画像の位置','coverLayout',data.coverLayout||(data.type==='free'?'left':'top'))}</div>
 ${data.type==='free'?`<div class="group"><h3>ギャラリー</h3>
 ${data.gallery.map((item,i)=>`<div class="group">${imageEditor(`ギャラリー画像 ${i+1}`,`gallery.${i}.image`,item,'image')}
 ${field('画像の代替テキスト',`gallery.${i}.alt`,item.alt)}
@@ -159,7 +165,7 @@ if(!String(data.pageTitle??'').trim()&&!String(data.body??'').trim()&&!safeImage
   setStatus('過去ログに移すコラムを入力してください');
   return;
 }
-data.entries.unshift({id:'note-'+Date.now(),date:data.date,title:data.pageTitle||'無題',body:data.body,image:data.coverImage,imageAlt:data.coverAlt});data.date=today();data.pageTitle='';data.body='';data.coverImage='';data.coverAlt='';tab='main';selectTab('main');updatePreview();setStatus('前のコラムを過去ログへ移動しました');return;}if(a==='delete-entry'&&confirm('この過去記事を削除しますか？'))data.entries.splice(i,1);if(a==='add-section')data.sections.push({date:today(),title:'',body:''});if(a==='delete-section'&&confirm('この記事を削除しますか？'))data.sections.splice(i,1);if(a==='move-link'){
+data.entries.unshift({id:'note-'+Date.now(),date:data.date,title:data.pageTitle||'無題',body:data.body,image:data.coverImage,imageAlt:data.coverAlt,imageLayout:data.coverLayout||'top'});data.date=today();data.pageTitle='';data.body='';data.coverImage='';data.coverAlt='';tab='main';selectTab('main');updatePreview();setStatus('前のコラムを過去ログへ移動しました');return;}if(a==='delete-entry'&&confirm('この過去記事を削除しますか？'))data.entries.splice(i,1);if(a==='add-section')data.sections.push({date:today(),title:'',body:''});if(a==='delete-section'&&confirm('この記事を削除しますか？'))data.sections.splice(i,1);if(a==='move-link'){
   const direction=Number(el.dataset.direction);
   const target=i+direction;
   if(target<0||target>=data.links.length)return;
@@ -177,7 +183,7 @@ if(a==='select-image'||a==='clear-image'){
   const key=path.pop();
   const item=path.reduce((obj,part)=>obj[part],data);
   if(a==='select-image'){
-    imageRequest={page:data,path,item,key};
+    imageRequest={page:data,path,item,key,format:item[key+'Format']||'original',quality:Number(item[key+'Quality'])||0.85};
     $('fileImage').click();
     return;
   }
@@ -203,9 +209,10 @@ for(const key of ['background','ink','accent','line']){
 .series-index{margin-top:24px;padding:clamp(14px,4vw,26px);border:1px solid ${d.line};border-radius:12px;margin-bottom:24px}.series-index ol{margin:0;padding-inline-start:1.5em}
 .episode-number{font-size:.75em;color:${d.accent};margin:0 0 6px}.seriesitem{scroll-margin-top:12px}
 .free-page .headline{justify-content:center;text-align:center}.free-page .headcopy{flex:0 1 auto}.free-page .headline h1{font-size:clamp(24px,5vw,38px)}.headline h1{font-size:clamp(24px,4.5vw,36px);line-height:1.35;margin:0}.site-return{font-size:.8em}
-.free-content{max-width:60ch;margin:auto}.free-content.with-side-cover{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);align-items:start;gap:clamp(14px,4vw,28px);max-width:none}
+.image-content{display:grid;gap:clamp(14px,4vw,28px);align-items:start}.image-content>*{min-width:0}.image-content .column-image,.image-content .page-cover{margin:0}.image-content.left{grid-template-columns:minmax(0,2fr) minmax(0,3fr)}.image-content.right{grid-template-columns:minmax(0,3fr) minmax(0,2fr)}
+.free-content{max-width:60ch;margin:auto}
 .gallery-section{margin:30px 0}.gallery figure{margin:0}.gallery img{display:block;width:100%;aspect-ratio:4/3;object-fit:contain;border-radius:8px;border:1px solid ${d.line}}.gallery figcaption{font-size:.8em;margin-top:6px}
-@media(max-width:600px){.free-content.with-side-cover{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){.image-content.left,.image-content.right{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:490px){.site{padding:20px 16px}.headline{gap:10px}.mascot,.mascot-fallback{width:min(${m}px,25vw)}.headline h2{font-size:1.22em}nav{gap:14px}}`;}
 const inlineText=text=>escapeHtml(text.replaceAll('<!--more-->','')).replace(/\n/g,'<br>');
 const paragraphs=s=>String(s||'').split(/\n\s*\n/).map(p=>`<p>${inlineText(p.trim())}</p>`).join('');
@@ -278,6 +285,12 @@ function archiveLinks(months){
 function contentImage(image,alt,cssClass='column-image'){
   return safeImage(image)?`<img class="${cssClass}" src="${escapeHtml(image)}" alt="${escapeHtml(alt)}">`:'';
 }
+function imageContent(image,body,layout='top'){
+  if(!image)return body;
+  if(layout==='side')layout='left';
+  if(!['top','bottom','left','right'].includes(layout))layout='top';
+  return `<div class="image-content ${layout}">${['bottom','right'].includes(layout)?body+image:image+body}</div>`;
+}
 function cornerLinks(){
   if(!data.showLinks)return '';
   const groups=new Map();
@@ -300,14 +313,13 @@ function seriesMarkup(heading,cover,links){
   const index=episodes.length?`<section class="series-index" aria-labelledby="series-index-title"><h2 class="sectiontitle" id="series-index-title">目次</h2><ol>${episodes.map(({entry,number})=>
     `<li><a href="#article-${number}">${escapeHtml(entry.title||'無題')}</a></li>`).join('')}</ol></section>`:'';
   const articles=episodes.map(({entry:e,number},index)=>`<article class="seriesitem" id="article-${number}"><p class="episode-number">第${number}回</p>${columnHeading(e.title,e.date)}
-    ${contentImage(e.image,e.imageAlt)}<div class="bodytext">${index===0?featuredBody(e.body):paragraphs(e.body)}</div></article>`).join('');
-  return `${heading}${cover}<section aria-label="連載の記事">${articles||'<p>まだ記事がありません。</p>'}</section>${index}${links?'<hr>'+links:''}`;
+    ${imageContent(contentImage(e.image,e.imageAlt),`<div class="bodytext">${index===0?featuredBody(e.body):paragraphs(e.body)}</div>`,e.imageLayout)}</article>`).join('');
+  return `${heading}${imageContent(cover,`<section aria-label="連載の記事">${articles||'<p>まだ記事がありません。</p>'}</section>`,data.coverLayout)}${index}${links?'<hr>'+links:''}`;
 }
 function freeMarkup(heading,cover,links){
   const figures=data.gallery.filter(item=>safeImage(item.image)).map(item=>
     `<figure>${contentImage(item.image,item.alt,'gallery-image')}${item.caption?`<figcaption>${escapeHtml(item.caption)}</figcaption>`:''}</figure>`).join('');
-  return `<article class="free-page">${heading}<div class="free-content${cover&&data.coverLayout!=='top'?' with-side-cover':''}">
-    ${cover}<div class="bodytext">${paragraphs(data.body)}</div></div>
+  return `<article class="free-page">${heading}<div class="free-content">${imageContent(cover,`<div class="bodytext">${paragraphs(data.body)}</div>`,data.coverLayout||'left')}</div>
     ${figures?`<section class="gallery-section"><h3 class="sectiontitle">ギャラリー</h3><div class="gallery">${figures}</div></section>`:''}</article>${links?'<hr>'+links:''}`;
 }
 function siteMarkup(){
@@ -318,8 +330,8 @@ function siteMarkup(){
   const links=cornerLinks();
 let main='';if(data.type==='home'){
   const {recent,months}=splitColumns();
-  const logs=recent.map(e=>`<details class="archiveitem"><summary>${columnHeading(e.title,e.date,'')}</summary><div class="bodytext">${contentImage(e.image,e.imageAlt)}${paragraphs(e.body)}</div></details>`).join('');
-  main=`<article id="latest">${headline}${cover}<div class="bodytext">${featuredBody(data.body)}</div></article><hr><details class="archive" id="archive"><summary>過去のコラム（${recent.length}件）</summary>${logs||'<p>まだありません。</p>'}</details>${archiveLinks(months)}${links?'<hr>'+links:''}`;
+  const logs=recent.map(e=>`<details class="archiveitem"><summary>${columnHeading(e.title,e.date,'')}</summary>${imageContent(contentImage(e.image,e.imageAlt),`<div class="bodytext">${paragraphs(e.body)}</div>`,e.imageLayout)}</details>`).join('');
+  main=`<article id="latest">${headline}${imageContent(cover,`<div class="bodytext">${featuredBody(data.body)}</div>`,data.coverLayout)}</article><hr><details class="archive" id="archive"><summary>過去のコラム（${recent.length}件）</summary>${logs||'<p>まだありません。</p>'}</details>${archiveLinks(months)}${links?'<hr>'+links:''}`;
 }
 else if(data.type==='series')main=seriesMarkup(headline,cover,links);
 else main=freeMarkup(headline,cover,links);
@@ -341,7 +353,7 @@ function makeHtml(){
 function makeArchiveHtml(month,entries){
   const title=monthLabel(month)+'のコラム';
   const home='../'+encodeURIComponent(filename(data.fileName,'html'));
-  const articles=entries.map(e=>`<article class="seriesitem">${columnHeading(e.title,e.date,'h3')}${contentImage(e.image,e.imageAlt)}<div class="bodytext">${paragraphs(e.body)}</div></article>`).join('');
+  const articles=entries.map(e=>`<article class="seriesitem">${columnHeading(e.title,e.date,'h3')}${imageContent(contentImage(e.image,e.imageAlt),`<div class="bodytext">${paragraphs(e.body)}</div>`,e.imageLayout)}</article>`).join('');
   return pageHtml(title+' | '+data.siteTitle,
     `<div class="site"><header><h1>${escapeHtml(data.siteTitle)}</h1></header><nav aria-label="ページ移動"><a href="${home}">トップページに戻る</a></nav><main><h2 class="sectiontitle">${title}</h2>${articles}</main></div>`);
 }
@@ -565,15 +577,30 @@ $('fileImage').addEventListener('change',()=>{
   if(!/^image\/(png|jpeg|webp|gif)$/.test(f.type)){alert('PNG・JPEG・WebP・GIFを選んでください');return;}
   if(f.size>3*1024*1024){alert('3MB以下の画像を選んでください。');return;}
   const r=new FileReader();
-  r.onload=()=>{
+  r.onload=async()=>{
+    try{
+    let result=r.result;
+    if(request.format==='webp'){
+      const image=new Image();
+      image.src=result;
+      await image.decode();
+      const canvas=document.createElement('canvas');
+      canvas.width=image.naturalWidth;canvas.height=image.naturalHeight;
+      const context=canvas.getContext('2d');
+      if(!context)throw Error('画像変換を利用できません');
+      context.drawImage(image,0,0);
+      result=canvas.toDataURL('image/webp',Math.max(0.1,Math.min(1,request.quality)));
+      if(!result.startsWith('data:image/webp;'))throw Error('このブラウザーはWebP変換に対応していません');
+    }
     if(request!==imageRequest||request.page!==data||
       request.path.reduce((obj,key)=>obj?.[key],data)!==request.item)return;
-    if(!safeImage(r.result)){alert('画像を読み込めませんでした。');return;}
-    request.item[request.key]=r.result;
+    if(!safeImage(result)){alert('画像を読み込めませんでした。');return;}
+    request.item[request.key]=result;
     imageRequest=null;
     renderEditor();
     updatePreview();
-    setStatus('画像を読み込みました');
+    setStatus(request.format==='webp'?'WebPに変換して読み込みました':'元の形式で画像を読み込みました');
+    }catch(error){if(request===imageRequest)alert('画像の読み込みに失敗しました：'+error.message);}
   };
   r.onerror=()=>{if(request===imageRequest)alert('画像を読み込めませんでした。');};
   r.readAsDataURL(f);
