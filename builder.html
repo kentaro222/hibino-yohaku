@@ -4,29 +4,82 @@
 :root{font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;color:#28332d;background:#eaece7;font-synthesis:none}*{box-sizing:border-box}body{margin:0}button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}header{background:#203e35;color:white;padding:16px clamp(14px,3vw,30px);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}header h1{font-size:19px;margin:0}header p{font-size:12px;margin:4px 0 0;color:#d4e7dd}.main{max-width:1370px;margin:auto;padding:16px;display:grid;grid-template-columns:minmax(300px,510px) minmax(0,1fr);gap:16px}.panel{background:#fff;border:1px solid #d9e0dc;border-radius:13px;box-shadow:0 3px 13px #203e3510;overflow:hidden}.panelhead{padding:14px 16px;border-bottom:1px solid #e8ece9;display:flex;justify-content:space-between;align-items:center;gap:9px}.panelhead strong{font-size:15px}.inside{padding:15px}.tools{display:flex;flex-wrap:wrap;gap:7px}.btn{border:1px solid #b6c7be;background:#fff;border-radius:8px;padding:9px 11px;font-size:13px;color:#234435;min-height:39px}.btn.primary{background:#28634c;color:white;border-color:#28634c}.btn.warn{color:#a24031;border-color:#e1b7b1}.btn:hover{filter:brightness(.96)}.tabs{display:flex;gap:5px;background:#f1f4f0;padding:5px;border-radius:10px;overflow:auto}.tab{border:0;background:transparent;border-radius:7px;padding:10px 13px;white-space:nowrap;font-size:13px}.tab.active{background:#fff;box-shadow:0 1px 5px #0001;font-weight:700;color:#22543f}.form{display:grid;gap:13px;margin-top:15px}.field{display:grid;gap:5px}.field label,.group-title{font-size:13px;font-weight:700}.help{font-size:12px;color:#60736a;margin:0;line-height:1.6}.field input,.field textarea,.field select{width:100%;border:1px solid #bccac1;border-radius:8px;background:white;padding:10px;color:#29372e;min-height:41px}.field textarea{resize:vertical;min-height:100px;line-height:1.7}.check{display:flex;align-items:center;gap:8px;font-size:13px}.check input{width:17px;height:17px;accent-color:#28634c}.split{display:grid;grid-template-columns:1fr 1fr;gap:10px}.group{padding:14px;background:#f8faf8;border:1px solid #e0e7df;border-radius:10px;display:grid;gap:11px}.group h3{margin:0;font-size:14px}.listrow{display:flex;align-items:center;gap:6px}.listrow input{min-width:0;flex:1}.listrow button{flex:none}.status{font-size:12px;color:#41624f;padding:8px 12px;background:#f0f7f0;border-radius:8px}.previewArea{padding:15px;background:#e5e8e4}.device{display:flex;gap:6px;align-items:center}.frame{width:100%;height:710px;border:1px solid #bac8bf;border-radius:9px;background:#fff}.frame.mobile{max-width:390px;margin:auto;display:block}.small{font-size:12px;color:#69756d}.muted{color:#65736a}details.helpbox{border:1px solid #dce4dd;border-radius:9px;margin-top:12px;padding:10px;background:#fbfcfb}details.helpbox summary{cursor:pointer;font-size:13px;font-weight:700}details.helpbox p{font-size:12px;line-height:1.75}.dropzone{border:1px dashed #a2b4a8;border-radius:9px;background:#f8faf8;padding:10px}a{color:#1f6549}.imagecheck{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.imagecheck img{width:62px;height:62px;object-fit:contain;background:#eef0eb;border:1px solid #dce2da;border-radius:8px}footer{text-align:center;color:#66736b;font-size:12px;padding:15px}.hidden{display:none!important}@media(max-width:900px){.main{grid-template-columns:1fr}.frame{height:630px}}@media(max-width:520px){.main{padding:8px;gap:8px}.inside{padding:11px}.panelhead{padding:12px}.split{grid-template-columns:1fr}.tools{gap:5px}.btn{padding:8px 9px}.previewArea{padding:8px}header{padding:13px}}
 
 #archiveExport,#textCodePanel{margin-bottom:12px}#textCode{font-family:ui-monospace,monospace}.archive-files{list-style:none;margin:0;padding:0;display:grid;gap:7px}.archive-files .btn{width:100%;text-align:left}.imagecheck .help{flex-basis:100%}.device{flex-wrap:wrap}.panelhead{flex-wrap:wrap}
-@media(max-width:520px){.btn,.tab{min-height:44px}.field input,.field textarea,.field select{font-size:16px}}
+.toolbar{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px}
+.toolbar-group{display:grid;gap:5px;padding:7px 9px;background:#ffffff0d;border:1px solid #ffffff38;border-radius:9px}
+.toolbar-label{font-size:11px;font-weight:700;color:#e1eee8}
+.btn.load{background:#eaf1fb;border-color:#a8bcda;color:#214a75}
+.btn.export{background:#ebf5ed;border-color:#a5c3aa;color:#245438}
+.btn.publish{background:#faedcf;border-color:#d6b86e;color:#684a0d}
+.btn.clear{background:#fff5f3;border-color:#e1b7b1;color:#893b2f}
+.code-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.compact-header .builder-tagline{display:none}
+#fileMenuBtn{min-height:44px;white-space:nowrap}
+.file-menu{width:min(92vw,420px);max-height:85vh;max-height:85dvh;overflow:auto;padding:0;color:#28332d;background:#fff;border:1px solid #b6c7be;border-radius:13px;box-shadow:0 12px 40px #203e3540}
+.file-menu::backdrop{background:#17282088}
+.file-menu-content{padding:14px}
+.file-menu-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+.file-menu-heading h2{font-size:17px;margin:0}
+.file-menu .toolbar{display:grid}
+.file-menu .toolbar-group{background:#f8faf8;border-color:#d9e0dc;padding:9px}
+.file-menu .toolbar-label{color:#41624f}
+.file-menu .btn{min-height:44px}
+.file-menu .toolbar-group .tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:350px){.compact-header h1{font-size:17px}}
+@media(max-width:520px){.toolbar{gap:6px}.toolbar-group{padding:6px}.btn,.tab{min-height:44px}.field input,.field textarea,.field select{font-size:16px}}
 </style></head><body>
-<header><div><h1>小さなサイトビルダー</h1><p>ページを個別に編集 → JSON保存 → HTML書き出し</p></div><div class="tools"><button class="btn" id="newBtn">＋ 新規ページ</button><button class="btn" id="loadJsonBtn">JSON読込</button><button class="btn" id="loadHtmlBtn">HTML読込</button><button class="btn primary" id="saveJsonBtn">JSON保存</button><button class="btn" id="textCodeBtn" aria-controls="textCodePanel" aria-expanded="false">テキストコード</button><button class="btn primary" id="saveHtmlBtn">HTML書出</button><button class="btn" id="archiveBtn" aria-controls="archiveExport" aria-expanded="false">アーカイブ作成</button></div></header>
-<main class="main"><section class="panel"><div class="panelhead"><strong>編集</strong><span class="status" id="status" role="status" aria-live="polite">準備できました</span></div><div class="inside">
+<header id="builderHeader">
+  <div><h1>小さなサイトビルダー</h1><p class="builder-tagline">ページを個別に編集 → 共有コード・JSON保存 → HTML書き出し</p></div>
+  <button class="btn hidden" id="fileMenuBtn" aria-haspopup="dialog" aria-controls="fileMenu" aria-expanded="false">ファイル操作</button>
+  <div id="desktopFileActions"><div class="toolbar" id="fileActions">
+    <div class="toolbar-group" role="group" aria-labelledby="workActions"><span class="toolbar-label" id="workActions">作業</span>
+      <div class="tools"><button class="btn" id="newBtn">＋ 新規ページ</button></div>
+    </div>
+    <div class="toolbar-group" role="group" aria-labelledby="saveActions"><span class="toolbar-label" id="saveActions">保存・読込</span>
+      <div class="tools">
+        <button class="btn primary" id="textCodeBtn" aria-controls="textCodePanel" aria-expanded="false">共有コード</button>
+        <button class="btn export" id="saveJsonBtn">JSON保存</button>
+        <button class="btn load" id="loadJsonBtn">JSON読込</button>
+        <button class="btn load" id="loadHtmlBtn">HTML読込</button>
+      </div>
+    </div>
+    <div class="toolbar-group" role="group" aria-labelledby="publishActions"><span class="toolbar-label" id="publishActions">公開用</span>
+      <div class="tools">
+        <button class="btn publish" id="saveHtmlBtn">HTML書出</button>
+        <button class="btn publish" id="archiveBtn" aria-controls="archiveExport" aria-expanded="false">アーカイブ作成</button>
+      </div>
+    </div>
+  </div></div>
+</header>
+<dialog class="file-menu" id="fileMenu" aria-labelledby="fileMenuTitle">
+  <div class="file-menu-content">
+    <div class="file-menu-heading"><h2 id="fileMenuTitle">ファイル操作</h2><button class="btn" id="closeFileMenuBtn" autofocus>閉じる</button></div>
+    <div id="mobileFileActions"></div>
+  </div>
+</dialog>
+<main class="main"><section class="panel"><div class="panelhead"><strong>編集</strong><span class="status" id="status" role="status" aria-live="polite">準備できました</span><span class="small" id="draftStatus" role="status">端末内の下書きを確認中</span></div><div class="inside">
 <section class="group hidden" id="textCodePanel" aria-labelledby="textCodeTitle">
-  <h3 id="textCodeTitle">テキストコードで保存・読み込み</h3>
-  <p class="help" id="textCodeHelp">保存するときは現在の原稿を表示してコピーするか、.txt で保存します。復元するときは、保存したコードを下の欄に貼り付けて読み込みます。</p>
-  <div class="tools"><button class="btn" id="refreshCodeBtn">現在の原稿を表示</button><button class="btn" id="saveTextBtn">.txt 保存</button></div>
-  <div class="field"><label for="textCode">テキストコード（JSON）</label>
+  <h3 id="textCodeTitle">共有コードで保存・読み込み</h3>
+  <p class="help" id="textCodeHelp">「書出」で今の原稿を欄に表示し、「コピー」でクリップボードに入れます。復元するときは「クリア」で欄を空にし、保存したコードを貼り付けて「読込」を押します。</p>
+  <div class="field"><label for="textCode">共有コード（旧JSONも貼り付け可）</label>
     <textarea id="textCode" rows="8" wrap="off" spellcheck="false" autocapitalize="off" autocomplete="off" aria-describedby="textCodeHelp"></textarea></div>
-  <div class="tools"><button class="btn" id="copyCodeBtn">コードをコピー</button><button class="btn primary" id="importCodeBtn">欄のコードを読み込む</button><button class="btn" id="closeCodeBtn">閉じる</button></div>
+  <div class="code-actions">
+    <button class="btn export" id="refreshCodeBtn">書出</button>
+    <button class="btn primary" id="copyCodeBtn">コピー</button>
+    <button class="btn clear" id="clearCodeBtn">クリア</button>
+    <button class="btn load" id="importCodeBtn">読込</button>
+  </div>
   <p class="help" id="textCodeStatus" role="status"></p>
 </section>
-<section class="group hidden" id="archiveExport" tabindex="-1" aria-label="アーカイブの書き出し"></section><div class="tabs" role="tablist"><button class="tab active" data-tab="main">ページ</button><button class="tab" data-tab="articles">記事・リンク</button><button class="tab" data-tab="design">デザイン</button><button class="tab" data-tab="images">画像</button></div><div id="editorContent"></div><details class="helpbox"><summary>使い方・注意点</summary><p>①ページを編集 ②プレビューで確認 ③JSONを保存（次回編集用） ④HTMLを書き出す（GitHubにアップロード用）。HTMLには再編集用データも埋め込みます。本ビルダー製のHTMLのみ再読込に対応します。一般のHTMLを自動解析するものではありません。</p><p>トップページの過去コラムは直近10本までです。「アーカイブ作成」で残りを月別に書き出せます。公開時はトップページと月別HTMLを同じ編集状態から書き出してください。</p><p>画像はHTMLに埋め込めますが、重い画像はファイルサイズが大きくなります。自作アプリへのリンクは、GitHub上の配置に合わせて相対URLを設定してください。ブラウザによって保存先の操作が異なります。アップロードはご自身で行ってください。</p></details></div></section>
+<section class="group hidden" id="archiveExport" tabindex="-1" aria-label="アーカイブの書き出し"></section><div class="tabs" role="tablist"><button class="tab active" data-tab="main">ページ</button><button class="tab" data-tab="articles">記事・リンク</button><button class="tab" data-tab="design">デザイン</button><button class="tab" data-tab="images">画像</button></div><div id="editorContent"></div><details class="helpbox"><summary>使い方・注意点</summary><p>①ページを編集 ②プレビューで確認 ③共有コードまたはJSONを保存（次回編集用） ④HTMLを書き出す（GitHubにアップロード用）。HTMLには再編集用データも埋め込みます。本ビルダー製のHTMLのみ再読込に対応します。一般のHTMLを自動解析するものではありません。</p><p>トップページの過去コラムは直近10本までです。「アーカイブ作成」で残りを月別に書き出せます。公開時はトップページと月別HTMLを同じ編集状態から書き出してください。</p><p>画像はHTMLに埋め込めますが、重い画像はファイルサイズが大きくなります。自作アプリへのリンクは、GitHub上の配置に合わせて相対URLを設定してください。ブラウザによって保存先の操作が異なります。アップロードはご自身で行ってください。</p></details></div></section>
 <section class="panel"><div class="panelhead"><strong>完成ページのプレビュー</strong><div class="device"><button class="btn" id="desktopBtn" aria-pressed="true">PC</button><button class="btn" id="mobileBtn" aria-pressed="false">スマホ</button><button class="btn" id="openPreviewBtn">別画面</button></div></div><div class="previewArea"><iframe class="frame" id="preview" title="ホームページのプレビュー" sandbox="allow-same-origin"></iframe></div></section></main>
 <footer>ファイルは端末上で処理します。サーバーへの送信・ログインはありません。</footer>
-<input class="hidden" id="fileJson" type="file" accept=".json,.txt,application/json,text/plain"><input class="hidden" id="fileHtml" type="file" accept=".html,.htm,text/html"><input class="hidden" id="fileImage" type="file" accept="image/png,image/jpeg,image/webp,image/gif"><script>
+<input class="hidden" id="fileJson" type="file" accept=".json,application/json"><input class="hidden" id="fileHtml" type="file" accept=".html,.htm,text/html"><input class="hidden" id="fileImage" type="file" accept="image/png,image/jpeg,image/webp,image/gif"><script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id);const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const safeUrl=s=>{s=String(s||'').trim();if(!s||/[\\\u0000-\u001f\u007f]/.test(s))return '#';if(/^(https?:\/\/|\.\.?\/|\/[^/]|#|[\w.-]+(?:\/[\w.\-]+)*\.(?:html?|pdf)(?:[?#].*)?$)/i.test(s) && !s.startsWith('//'))return s;return '#'};
 const HOME_LOG_LIMIT=10;
 const HTML_TYPE='text/html;charset=utf-8';
 const today=()=>new Date().toLocaleDateString('sv-SE');
-const fresh=(type='home')=>({version:1,type,fileName:type==='home'?'index.html':type==='series'?'series.html':'page.html',siteTitle:'日々の余白',siteSubtitle:'日々のことを、少しずつ。',pageTitle:type==='home'?'今日のコラム':type==='series'?'新しい連載':'新しいページ',description:'',date:today(),body:'今日は少し遠回りをして帰った。\n\n小さな出来事を、少しずつ書き留めていく。',entries:[{id:'example-1',date:'2026-11-03',title:'散歩の途中で',body:'いつもと違う道を歩いた。'}],links:[{title:'本についての覚え書き',url:'series/books.html',description:''},{title:'ルノルマンカード占い',url:'lenormand/index.html',description:''}],sections:[{title:'第1回　はじめに',date:today(),body:'ここから連載を始めます。'}],design:{background:'#F7F4EA',ink:'#30332E',accent:'#425948',line:'#D9D2C4',fontSize:17,lineHeight:1.9,maxWidth:760,titleDate:'above',showMascot:true,mascotPos:'left',mascotWidth:82,showSubtitle:true},mascot:'',extraImages:[],gallery:[],seriesOrder:'newest',homeUrl:'index.html'});
+const fresh=(type='home')=>({version:1,type,fileName:type==='home'?'index.html':type==='series'?'series.html':'page.html',siteTitle:'',siteSubtitle:'',pageTitle:'',browserTitle:'',description:'',date:today(),body:'',entries:[],links:[],sections:[],design:{background:'#F7F4EA',ink:'#30332E',accent:'#425948',line:'#D9D2C4',fontSize:17,lineHeight:1.9,maxWidth:760,titleDate:'above',showMascot:true,mascotPos:'left',mascotWidth:82,showSubtitle:true},mascot:'',extraImages:[],gallery:[],seriesOrder:'newest',homeUrl:'index.html'});
 const safeImage=s=>typeof s==='string'&&/^data:image\/(png|jpeg|webp|gif);base64,[a-z0-9+/=]+$/i.test(s)?s:'';
 let data=fresh(),tab='main',device='desktop',imageRequest;
 const setStatus=s=>{$('status').textContent=s};
@@ -39,12 +92,14 @@ function imageEditor(label,path,item,key){
     ${image?`<button class="btn warn" data-action="clear-image" data-image-path="${path}" aria-label="${label}を外す">外す</button>`:''}</div>`;
 }
 function renderEditor(){const d=data.design;let html='';
-if(tab==='main')html=`<div class="form">${field('ページの種類','type',data.type,'select',[option('home','トップページ',data.type),option('series','連載ページ',data.type),option('free','自由ページ',data.type)].join(''))}${field('公開ファイル名','fileName',data.fileName)}<p class="help">例：index.html / books.html。拡張子は .html にしてください。</p>${field('サイト名','siteTitle',data.siteTitle)}${data.type==='home'?field('サイトの紹介文','siteSubtitle',data.siteSubtitle):''}
+if(tab==='main')html=`<div class="form">${field('ページの種類','type',data.type,'select',[option('home','トップページ',data.type),option('series','連載ページ',data.type),option('free','自由ページ',data.type)].join(''))}${field('公開ファイル名','fileName',data.fileName)}<p class="help">例：index.html / books.html。拡張子は .html にしてください。</p>${field(data.type==='home'?'サイト名（トップの見出し）':'サイト名（トップへ戻るリンクの表示名）','siteTitle',data.siteTitle)}${data.type==='home'?field('サイトの紹介文','siteSubtitle',data.siteSubtitle):''}
 ${data.type!=='home'?`${field('トップページへのリンク','homeUrl',data.homeUrl)}<p class="help">同じ階層なら index.html、1つ上の階層なら ../index.html を指定します。</p>`:''}
 ${data.type==='series'?field('連載記事の表示順','seriesOrder',data.seriesOrder,'select',[
   option('manual','編集一覧の順',data.seriesOrder),
   option('newest','日付の新しい順',data.seriesOrder)
-].join('')):''}${data.type!=='home'?field('ページのタイトル','pageTitle',data.pageTitle):''}${data.type==='home'?`${field('最新コラムの日付','date',data.date,'date')}${field('最新コラムのタイトル','pageTitle',data.pageTitle||'今日のコラム')}`:''}${data.type==='series'?'<p class="help">各回のタイトルや本文は「記事・リンク」で編集します。</p>':`${field(data.type==='home'?'最新コラム本文':'ページ本文','body',data.body,'textarea')}<p class="help">改行はそのまま反映します。HTMLタグではなく通常の文章を入力してください。</p>`}</div>`;
+].join('')):''}${data.type!=='home'?field(data.type==='series'?'連載ページの題名':'自由ページの題名','pageTitle',data.pageTitle):''}
+${field('ブラウザのタブに表示するタイトル','browserTitle',data.browserTitle)}
+<p class="help">空欄の場合は題名やサイト名から自動で表示します。</p>${data.type==='home'?`${field('最新コラムの日付','date',data.date,'date')}${field('最新コラムのタイトル','pageTitle',data.pageTitle)}`:''}${data.type==='series'?'<p class="help">各回のタイトルや本文は「記事・リンク」で編集します。</p>':`${field(data.type==='home'?'最新コラム本文':'ページ本文','body',data.body,'textarea')}<p class="help">改行はそのまま反映します。HTMLタグではなく通常の文章を入力してください。</p>`}</div>`;
 if(tab==='articles'){
 if(data.type==='home')html=`<div class="form"><div class="group"><h3>過去のコラム</h3><p class="help">公開時は日付の新しい順に10本までトップに表示し、残りはアーカイブに掲載します。すべての原稿をここで編集できます。</p><div id="entryList">${data.entries.map((e,i)=>`<div class="group"><div class="split">${field('日付',`entries.${i}.date`,e.date,'date')}${field('タイトル',`entries.${i}.title`,e.title)}</div>${field('本文',`entries.${i}.body`,e.body,'textarea')}${imageEditor('記事の画像',`entries.${i}.image`,e,'image')}${field('画像の代替テキスト',`entries.${i}.imageAlt`,e.imageAlt)}<button class="btn warn" data-action="delete-entry" data-index="${i}">この過去記事を削除</button></div>`).join('')}</div><div class="tools"><button class="btn" data-action="add-entry">＋ 過去記事を追加</button><button class="btn" data-action="archive-latest">最新コラムを過去ログに移す</button></div></div>${linkEditor()}</div>`;
 else if(data.type==='series')html=`<div class="form"><div class="group"><h3>連載の記事</h3>${data.sections.map((e,i)=>`<div class="group"><div class="split">${field('記事タイトル',`sections.${i}.title`,e.title)}${field('日付',`sections.${i}.date`,e.date,'date')}</div>${field('本文',`sections.${i}.body`,e.body,'textarea')}${imageEditor('記事の画像',`sections.${i}.image`,e,'image')}${field('画像の代替テキスト',`sections.${i}.imageAlt`,e.imageAlt)}<button class="btn warn" data-action="delete-section" data-index="${i}">この記事を削除</button></div>`).join('')}<button class="btn" data-action="add-section">＋ 連載記事を追加</button></div>${linkEditor()}</div>`;
@@ -67,9 +122,30 @@ ${field('キャプション',`gallery.${i}.caption`,item.caption)}
 <button class="btn warn" data-action="delete-gallery" data-index="${i}">この画像枠を削除</button></div>`).join('')}
 <button class="btn" data-action="add-gallery">＋ 画像枠を追加</button></div>`:''}</div>`;
 $('editorContent').innerHTML=html; bindEditor();}
-function linkEditor(){return `<div class="group"><h3>リンク一覧</h3><p class="help">リンクはカードで表示します。画像を設定するとアイコン文字より優先されます。</p>${data.links.map((l,i)=>`<div class="group">${field('リンクの表示名',`links.${i}.title`,l.title)}${field('リンク先',`links.${i}.url`,l.url)}${field('短い説明（任意）',`links.${i}.description`,l.description||'')}${field('アイコン文字（例 📚・🔮）',`links.${i}.icon`,l.icon,'text','maxlength="12"')}${imageEditor('リンク画像',`links.${i}.image`,l,'image')}<button class="btn warn" data-action="delete-link" data-index="${i}">削除</button></div>`).join('')}<button class="btn" data-action="add-link">＋ リンクを追加</button></div>`}
-function updateByPath(path,value){const parts=path.split('.');let obj=data;for(let i=0;i<parts.length-1;i++){obj=obj[parts[i]];}obj[parts.at(-1)]=value;if(path==='type'){let t=value;data.type=t;data.fileName=t==='home'?'index.html':t==='series'?'series.html':'page.html';renderEditor();}updatePreview();setStatus('編集中（未保存）')}
-function bindEditor(){document.querySelectorAll('[data-path]').forEach(el=>{const evt=el.type==='checkbox'||el.type==='color'||el.tagName==='SELECT'||el.type==='date'?'change':'input';el.addEventListener(evt,()=>{let v=el.type==='checkbox'?el.checked:el.value;if(el.type==='number')v=Number(v);updateByPath(el.dataset.path,v);});});document.querySelectorAll('[data-action]').forEach(el=>el.addEventListener('click',()=>{const a=el.dataset.action,i=Number(el.dataset.index);if(a==='add-entry')data.entries.unshift({id:'note-'+Date.now(),date:today(),title:'新しい過去記事',body:''});if(a==='archive-latest'){data.entries.unshift({id:'note-'+Date.now(),date:data.date,title:data.pageTitle||'無題',body:data.body,image:data.coverImage,imageAlt:data.coverAlt});data.date=today();data.pageTitle='新しいコラム';data.body='';data.coverImage='';data.coverAlt='';tab='main';selectTab('main');setStatus('前のコラムを過去ログへ移動しました');return;}if(a==='delete-entry'&&confirm('この過去記事を削除しますか？'))data.entries.splice(i,1);if(a==='add-section')data.sections.push({date:today(),title:'新しい記事',body:''});if(a==='delete-section'&&confirm('この記事を削除しますか？'))data.sections.splice(i,1);if(a==='add-link')data.links.push({title:'新しいリンク',url:'#',description:''});if(a==='delete-link'&&confirm('このリンクを削除しますか？'))data.links.splice(i,1);if(a==='add-gallery')data.gallery.push({image:'',alt:'',caption:''});if(a==='delete-gallery'&&confirm('この画像枠を削除しますか？'))data.gallery.splice(i,1);
+function linkEditor(){return `<div class="group"><h3>リンク一覧</h3><p class="help">リンクはカードで表示します。画像を設定するとアイコン文字より優先されます。</p>${data.links.map((l,i)=>`<div class="group">${field('リンクの表示名',`links.${i}.title`,l.title)}${field('リンク先',`links.${i}.url`,l.url)}${field('短い説明（任意）',`links.${i}.description`,l.description||'')}${field('アイコン文字（例 📚・🔮）',`links.${i}.icon`,l.icon,'text','maxlength="12"')}${imageEditor('リンク画像',`links.${i}.image`,l,'image')}<div class="tools">
+  <button class="btn" data-action="move-link" data-index="${i}" data-direction="-1" aria-label="${i+1}番目のリンクを上へ" ${i===0?'disabled':''}>↑ 上へ</button>
+  <button class="btn" data-action="move-link" data-index="${i}" data-direction="1" aria-label="${i+1}番目のリンクを下へ" ${i===data.links.length-1?'disabled':''}>↓ 下へ</button>
+  <button class="btn warn" data-action="delete-link" data-index="${i}">削除</button>
+</div></div>`).join('')}<button class="btn" data-action="add-link">＋ リンクを追加</button></div>`}
+function updateByPath(path,value){const parts=path.split('.');let obj=data;for(let i=0;i<parts.length-1;i++){obj=obj[parts[i]];}obj[parts.at(-1)]=value;if(path==='type'){let t=value;data.type=t;data.fileName=t==='home'?'index.html':t==='series'?'series.html':'page.html';renderEditor();}updatePreview();setStatus('編集中')}
+function bindEditor(){document.querySelectorAll('[data-path]').forEach(el=>{const evt=el.type==='checkbox'||el.type==='color'||el.tagName==='SELECT'||el.type==='date'?'change':'input';el.addEventListener(evt,()=>{let v=el.type==='checkbox'?el.checked:el.value;if(el.type==='number')v=Number(v);updateByPath(el.dataset.path,v);});});document.querySelectorAll('[data-action]').forEach(el=>el.addEventListener('click',()=>{const a=el.dataset.action,i=Number(el.dataset.index);if(a==='add-entry')data.entries.unshift({id:'note-'+Date.now(),date:today(),title:'',body:''});if(a==='archive-latest'){
+if(!String(data.pageTitle??'').trim()&&!String(data.body??'').trim()&&!safeImage(data.coverImage)){
+  setStatus('過去ログに移すコラムを入力してください');
+  return;
+}
+data.entries.unshift({id:'note-'+Date.now(),date:data.date,title:data.pageTitle||'無題',body:data.body,image:data.coverImage,imageAlt:data.coverAlt});data.date=today();data.pageTitle='';data.body='';data.coverImage='';data.coverAlt='';tab='main';selectTab('main');setStatus('前のコラムを過去ログへ移動しました');return;}if(a==='delete-entry'&&confirm('この過去記事を削除しますか？'))data.entries.splice(i,1);if(a==='add-section')data.sections.push({date:today(),title:'',body:''});if(a==='delete-section'&&confirm('この記事を削除しますか？'))data.sections.splice(i,1);if(a==='move-link'){
+  const direction=Number(el.dataset.direction);
+  const target=i+direction;
+  if(target<0||target>=data.links.length)return;
+  [data.links[i],data.links[target]]=[data.links[target],data.links[i]];
+  renderEditor();
+  updatePreview();
+  const focusDirection=target+direction<0||target+direction>=data.links.length?-direction:direction;
+  document.querySelector(`[data-action="move-link"][data-index="${target}"][data-direction="${focusDirection}"]`)?.focus();
+  setStatus(`リンクを${target+1}番目に移動しました`);
+  return;
+}
+if(a==='add-link')data.links.push({title:'',url:'',description:''});if(a==='delete-link'&&confirm('このリンクを削除しますか？'))data.links.splice(i,1);if(a==='add-gallery')data.gallery.push({image:'',alt:'',caption:''});if(a==='delete-gallery'&&confirm('この画像枠を削除しますか？'))data.gallery.splice(i,1);
 if(a==='select-image'||a==='clear-image'){
   const path=el.dataset.imagePath.split('.');
   const key=path.pop();
@@ -215,7 +291,9 @@ function pageHtml(title,markup,extra=''){
 }
 function makeHtml(){
   const embedded=JSON.stringify(data).replace(/</g,'\\u003c').replace(/>/g,'\\u003e').replace(/&/g,'\\u0026').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029');
-  return pageHtml((data.pageTitle?data.pageTitle+' | ':'')+data.siteTitle,siteMarkup(),
+  const title=String(data.browserTitle??'').trim()||[data.pageTitle,data.siteTitle].filter(Boolean).join(' | ')||
+    {home:'トップページ',series:'連載ページ',free:'自由ページ'}[data.type];
+  return pageHtml(title,siteMarkup(),
     `<script id="site-builder-data" type="application/json">${embedded}</`+`script>`);
 }
 function makeArchiveHtml(month,entries){
@@ -245,72 +323,121 @@ function showArchiveExport(){
   panel.focus({preventScroll:true});
   panel.scrollIntoView({block:'nearest'});
 }
-function updatePreview(){
+function updatePreview(saveDraft=true){
   $('preview').srcdoc=makeHtml();
   $('archiveBtn').disabled=data.type!=='home';
   $('archiveBtn').setAttribute('aria-expanded','false');
   $('archiveExport').classList.add('hidden');
   $('archiveExport').replaceChildren();
+  if(saveDraft)scheduleDraft();
 }
 function filename(s,ext){s=String(s||'').split(/[\\/]/).pop().replace(/[^a-zA-Z0-9._-]/g,'_').replace(/^\.+/,'');return s&&s.toLowerCase().endsWith('.'+ext)?s:(s||'page')+'.'+ext;}
 function download(name,content,type){const blob=new Blob([content],{type});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);}
 const serializeData=()=>JSON.stringify(data,null,2);
 const dataFilename=ext=>filename(data.fileName.replace(/\.html?$/i,''),ext);
-const parseCode=code=>JSON.parse(code.trim());
+const CODE_PREFIX='SB1G:';
+async function shareCode(json){
+  if(typeof CompressionStream!=='function'||typeof DecompressionStream!=='function')return json;
+  try{
+    const stream=new Blob([json]).stream().pipeThrough(new CompressionStream('gzip'));
+    const bytes=new Uint8Array(await new Response(stream).arrayBuffer());
+    let binary='';
+    for(let i=0;i<bytes.length;i+=32768)binary+=String.fromCharCode(...bytes.subarray(i,i+32768));
+    const compressed=CODE_PREFIX+btoa(binary);
+    return compressed.length<json.length?compressed:json;
+  }catch{
+    return json;
+  }
+}
+async function parseCode(input){
+  const code=input.trim();
+  if(!code.startsWith(CODE_PREFIX))return JSON.parse(code);
+  if(typeof DecompressionStream!=='function')throw Error('圧縮コードに対応したブラウザか、JSONのバックアップを使ってください');
+  const binary=atob(code.slice(CODE_PREFIX.length).replace(/\s/g,''));
+  const bytes=Uint8Array.from(binary,char=>char.charCodeAt(0));
+  const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+  return JSON.parse(await new Response(stream).text());
+}
+let codeRequest=0;
 function setCodeStatus(message){$('textCodeStatus').textContent=message;}
-function closeCodePanel(){
-  $('textCodePanel').classList.add('hidden');
-  $('textCodeBtn').setAttribute('aria-expanded','false');
+function clearCode(){
+  codeRequest++;
   $('textCode').value='';
   setCodeStatus('');
 }
-function refreshCode(){
-  $('textCode').value=serializeData();
-  setCodeStatus('現在の原稿を表示しました。編集後はもう一度このボタンを押すと更新できます。');
+function closeCodePanel(){
+  clearCode();
+  $('textCodePanel').classList.add('hidden');
+  $('textCodeBtn').setAttribute('aria-expanded','false');
 }
-$('textCodeBtn').onclick=()=>{
-  if($('textCodePanel').classList.contains('hidden'))refreshCode();
+async function refreshCode(){
+  const request=++codeRequest;
+  $('textCode').value='';
+  setCodeStatus('共有コードを作成中…');
+  const code=await shareCode(JSON.stringify(data));
+  if(request!==codeRequest)return;
+  $('textCode').value=code;
+  setCodeStatus(code.startsWith(CODE_PREFIX)?'圧縮した共有コードを表示しました。':'JSON形式の共有コードを表示しました。');
+}
+$('textCode').addEventListener('input',()=>{
+  codeRequest++;
+  setCodeStatus('');
+});
+$('textCodeBtn').onclick=async()=>{
+  if(!$('textCodePanel').classList.contains('hidden')){
+    closeCodePanel();
+    return;
+  }
   $('textCodePanel').classList.remove('hidden');
   $('textCodeBtn').setAttribute('aria-expanded','true');
   $('textCode').focus();
+  await refreshCode();
 };
 $('refreshCodeBtn').onclick=refreshCode;
-$('closeCodeBtn').onclick=()=>{
-  closeCodePanel();
-  $('textCodeBtn').focus();
-};
-$('saveTextBtn').onclick=()=>{
-  download(dataFilename('txt'),serializeData(),'text/plain;charset=utf-8');
-  setCodeStatus('現在の原稿を .txt で書き出しました。');
+$('clearCodeBtn').onclick=()=>{
+  clearCode();
+  $('textCode').focus();
+  setCodeStatus('コード欄を空にしました。');
 };
 $('copyCodeBtn').onclick=async()=>{
   const field=$('textCode');
-  if(!field.value.trim()){
-    setCodeStatus('コピーするコードを表示するか貼り付けてください。');
+  const code=field.value;
+  if(!code.trim()){
+    setCodeStatus('「書出」を押すか、コピーするコードを貼り付けてください。');
     return;
   }
+  const request=codeRequest;
   try{
-    await navigator.clipboard.writeText(field.value);
-    setCodeStatus('コードをコピーしました。');
+    await navigator.clipboard.writeText(code);
   }catch{
+    if(request!==codeRequest)return;
     field.focus();
     field.select();
-    setCodeStatus('コードを選択しました。端末のコピー操作を使ってください。');
+    field.setSelectionRange(0,code.length);
+    try{
+      if(!document.execCommand('copy'))throw Error('コピーが許可されていません');
+    }catch{
+      setCodeStatus('自動コピーできませんでした。選択したコードを端末の操作でコピーしてください。');
+      return;
+    }
   }
+  if(request===codeRequest)setCodeStatus('クリップボードにコピーしました。');
 };
-$('importCodeBtn').onclick=()=>{
+$('importCodeBtn').onclick=async()=>{
   const code=$('textCode').value;
   if(!code.trim()){
     setCodeStatus('保存したコードを貼り付けてください。');
     return;
   }
   try{
-    const imported=parseCode(code);
+    const request=++codeRequest;
+    const imported=await parseCode(code);
+    if(request!==codeRequest)return;
     if(!validate(imported))throw Error('このビルダーに対応した原稿コードではありません');
     if(!confirm('現在の編集内容を、貼り付けた原稿コードで置き換えますか？'))return;
     restore(imported);
     $('textCodeBtn').focus();
-    setStatus('テキストコードを読み込みました');
+    setStatus('共有コードを読み込みました');
   }catch(err){
     setCodeStatus('読み込み失敗：'+err.message);
   }
@@ -322,8 +449,70 @@ function validate(x){
     &&[x.entries,x.links,x.sections,...(x.gallery===undefined?[]:[x.gallery])].every(list=>Array.isArray(list)
       &&list.every(row=>row&&typeof row==='object'&&!Array.isArray(row)));
 }
-function restore(x){if(!validate(x))throw Error('このビルダーに対応したデータではありません');imageRequest=null;data=Object.assign(fresh(x.type),x,{design:Object.assign(fresh().design,x.design)});closeCodePanel();selectTab('main');updatePreview();setStatus('読み込みました');}
-async function readFile(input,mode){const f=input.files?.[0];input.value='';if(!f)return;try{const s=await f.text();if(mode==='json')restore(parseCode(s));else{const doc=new DOMParser().parseFromString(s,'text/html');const e=doc.getElementById('site-builder-data');if(!e)throw Error('編集データの埋め込まれたHTMLではありません');restore(JSON.parse(e.textContent));}}catch(err){alert('読み込み失敗：'+err.message)}}
+function restore(x,saveDraft=true){if(!validate(x))throw Error('このビルダーに対応したデータではありません');imageRequest=null;data=Object.assign(fresh(x.type),x,{design:Object.assign(fresh().design,x.design)});closeCodePanel();selectTab('main');updatePreview(saveDraft);setStatus('読み込みました');}
+async function readFile(input,mode){const f=input.files?.[0];input.value='';if(!f)return;try{const s=await f.text();if(mode==='json')restore(await parseCode(s));else{const doc=new DOMParser().parseFromString(s,'text/html');const e=doc.getElementById('site-builder-data');if(!e)throw Error('編集データの埋め込まれたHTMLではありません');restore(JSON.parse(e.textContent));}}catch(err){alert('読み込み失敗：'+err.message)}}
+const DRAFT_KEY='small-site-builder:draft:v1';
+let draftDb,draftTimer,draftRevision=0;
+function openDraftDb(){
+  return draftDb??=new Promise((resolve,reject)=>{
+    const request=indexedDB.open('small-site-builder-drafts',1);
+    request.onupgradeneeded=()=>request.result.createObjectStore('drafts');
+    request.onsuccess=()=>resolve(request.result);
+    request.onerror=()=>reject(request.error);
+    request.onblocked=()=>reject(Error('下書き領域を開けません'));
+  });
+}
+async function draftTransaction(mode,operation){
+  const db=await openDraftDb();
+  return new Promise((resolve,reject)=>{
+    const transaction=db.transaction('drafts',mode);
+    const request=operation(transaction.objectStore('drafts'));
+    transaction.oncomplete=()=>resolve(request.result);
+    transaction.onabort=()=>reject(transaction.error);
+  });
+}
+function scheduleDraft(){
+  draftRevision++;
+  $('draftStatus').textContent='下書きを保存中…';
+  clearTimeout(draftTimer);
+  draftTimer=setTimeout(saveDraft,250);
+}
+async function saveDraft(){
+  if(draftTimer===undefined)return;
+  clearTimeout(draftTimer);
+  draftTimer=undefined;
+  const revision=draftRevision;
+  const record=JSON.stringify({savedAt:Date.now(),data});
+  try{
+    try{localStorage.setItem(DRAFT_KEY,record);}
+    catch{await draftTransaction('readwrite',store=>store.put(record,DRAFT_KEY));}
+    if(revision===draftRevision)$('draftStatus').textContent='端末内に下書き保存済み';
+  }catch{
+    if(revision===draftRevision)$('draftStatus').textContent='端末内に保存できません。共有コードかJSONで保存してください。';
+  }
+}
+function readDraftRecord(record){
+  const parsed=JSON.parse(record);
+  return parsed&&Number.isFinite(parsed.savedAt)&&validate(parsed.data)?parsed:null;
+}
+async function restoreDraft(){
+  let local=null,large=null;
+  try{local=readDraftRecord(localStorage.getItem(DRAFT_KEY));}catch{}
+  try{large=readDraftRecord(await draftTransaction('readonly',store=>store.get(DRAFT_KEY))??null);}catch{}
+  if(draftRevision!==0)return;
+  const latest=local&&(!large||local.savedAt>=large.savedAt)?local:large;
+  if(latest){
+    restore(latest.data,false);
+    setStatus('前回の下書きを復元しました');
+    $('draftStatus').textContent='端末内に下書き保存済み';
+  }else{
+    $('draftStatus').textContent='編集中の原稿は端末内に自動保存します';
+  }
+}
+window.addEventListener('pagehide',saveDraft);
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='hidden')saveDraft();
+});
 $('fileJson').addEventListener('change',()=>readFile($('fileJson'),'json'));$('fileHtml').addEventListener('change',()=>readFile($('fileHtml'),'html'));
 $('fileImage').addEventListener('change',()=>{
   const f=$('fileImage').files?.[0];
@@ -346,8 +535,36 @@ $('fileImage').addEventListener('change',()=>{
   r.onerror=()=>{if(request===imageRequest)alert('画像を読み込めませんでした。');};
   r.readAsDataURL(f);
 });
+function setupFileMenu(){
+  const dialog=$('fileMenu');
+  if(typeof dialog.showModal!=='function'||typeof window.matchMedia!=='function')return;
+  const opener=$('fileMenuBtn');
+  const actions=$('fileActions');
+  const desktop=$('desktopFileActions');
+  const mobile=$('mobileFileActions');
+  const narrow=window.matchMedia('(max-width: 640px)');
+  function placeActions(){
+    if(!narrow.matches&&dialog.open)dialog.close();
+    (narrow.matches?mobile:desktop).append(actions);
+    desktop.hidden=narrow.matches;
+    opener.classList.toggle('hidden',!narrow.matches);
+    $('builderHeader').classList.toggle('compact-header',narrow.matches);
+  }
+  opener.onclick=()=>{
+    dialog.showModal();
+    opener.setAttribute('aria-expanded','true');
+  };
+  $('closeFileMenuBtn').onclick=()=>dialog.close();
+  dialog.addEventListener('close',()=>opener.setAttribute('aria-expanded',String(dialog.open)));
+  dialog.addEventListener('click',event=>{
+    if(event.target===dialog||actions.contains(event.target.closest('button')))dialog.close();
+  },true);
+  narrow.addEventListener('change',placeActions);
+  placeActions();
+}
+setupFileMenu();
 $('archiveBtn').onclick=showArchiveExport;
-$('newBtn').onclick=()=>{if(!confirm('現在の編集内容を破棄して新しいページを作りますか？ 必要なら先にJSONを保存してください。'))return;data=fresh();closeCodePanel();selectTab('main');updatePreview();setStatus('新規ページを作りました')};$('loadJsonBtn').onclick=()=>$('fileJson').click();$('loadHtmlBtn').onclick=()=>$('fileHtml').click();$('saveJsonBtn').onclick=()=>{download(dataFilename('json'),serializeData(),'application/json;charset=utf-8');setStatus('JSONを書き出しました')};$('saveHtmlBtn').onclick=()=>{download(filename(data.fileName,'html'),makeHtml(),HTML_TYPE);setStatus('HTMLを書き出しました')};$('desktopBtn').onclick=()=>setDevice('desktop');$('mobileBtn').onclick=()=>setDevice('mobile');function setDevice(d){device=d;$('preview').classList.toggle('mobile',d==='mobile');$('desktopBtn').setAttribute('aria-pressed',String(d==='desktop'));$('mobileBtn').setAttribute('aria-pressed',String(d==='mobile'));} $('openPreviewBtn').onclick=()=>{const b=new Blob([makeHtml()],{type:'text/html;charset=utf-8'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.target='_blank';a.rel='noopener';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000)};
-document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>selectTab(b.dataset.tab));selectTab('main');updatePreview();
+$('newBtn').onclick=()=>{if(!confirm('現在の編集内容を破棄して新しいページを作りますか？ 必要なら先に共有コードかJSONで保存してください。'))return;data=fresh();closeCodePanel();selectTab('main');updatePreview();setStatus('新規ページを作りました')};$('loadJsonBtn').onclick=()=>$('fileJson').click();$('loadHtmlBtn').onclick=()=>$('fileHtml').click();$('saveJsonBtn').onclick=()=>{download(dataFilename('json'),serializeData(),'application/json;charset=utf-8');setStatus('JSONを書き出しました')};$('saveHtmlBtn').onclick=()=>{download(filename(data.fileName,'html'),makeHtml(),HTML_TYPE);setStatus('HTMLを書き出しました')};$('desktopBtn').onclick=()=>setDevice('desktop');$('mobileBtn').onclick=()=>setDevice('mobile');function setDevice(d){device=d;$('preview').classList.toggle('mobile',d==='mobile');$('desktopBtn').setAttribute('aria-pressed',String(d==='desktop'));$('mobileBtn').setAttribute('aria-pressed',String(d==='mobile'));} $('openPreviewBtn').onclick=()=>{const b=new Blob([makeHtml()],{type:'text/html;charset=utf-8'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.target='_blank';a.rel='noopener';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000)};
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>selectTab(b.dataset.tab));selectTab('main');updatePreview(false);restoreDraft();
 })();
 </script></body></html>
