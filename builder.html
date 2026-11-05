@@ -29,6 +29,7 @@
 </style></head><body>
 <header id="builderHeader">
   <div><h1>小さなサイトビルダー</h1><p class="builder-tagline">ページを個別に編集 → 共有コード・JSON保存 → HTML書き出し</p></div>
+  <div class="tools" role="group" aria-label="編集履歴"><button class="btn" id="undoBtn" disabled>元に戻す</button><button class="btn" id="redoBtn" disabled>やり直す</button></div>
   <button class="btn hidden" id="fileMenuBtn" aria-haspopup="dialog" aria-controls="fileMenu" aria-expanded="false">ファイル操作</button>
   <div id="desktopFileActions"><div class="toolbar" id="fileActions">
     <div class="toolbar-group" role="group" aria-labelledby="workActions"><span class="toolbar-label" id="workActions">作業</span>
@@ -79,9 +80,34 @@ const $=id=>document.getElementById(id);const escapeHtml=s=>String(s??'').replac
 const HOME_LOG_LIMIT=10;
 const HTML_TYPE='text/html;charset=utf-8';
 const today=()=>new Date().toLocaleDateString('sv-SE');
-const fresh=(type='home')=>({version:1,type,fileName:type==='home'?'index.html':type==='series'?'series.html':'page.html',siteTitle:'',siteSubtitle:'',pageTitle:'',browserTitle:'',description:'',date:today(),body:'',entries:[],links:[],sections:[],design:{background:'#F7F4EA',ink:'#30332E',accent:'#425948',line:'#D9D2C4',fontSize:17,lineHeight:1.9,maxWidth:760,titleDate:'above',showMascot:true,mascotPos:'left',mascotWidth:82,showSubtitle:true},mascot:'',extraImages:[],gallery:[],seriesOrder:'newest',homeUrl:'index.html'});
+const fresh=(type='home')=>({version:1,type,fileName:type==='home'?'index.html':type==='series'?'series.html':'page.html',siteTitle:'',siteSubtitle:'',pageTitle:'',browserTitle:'',description:'',date:today(),body:'',entries:[],links:[],linksTitle:'連載・その他のページ',showLinks:true,sections:[],design:{background:'#F7F4EA',ink:'#30332E',accent:'#425948',line:'#D9D2C4',fontSize:17,lineHeight:1.9,maxWidth:760,titleDate:'above',showMascot:true,mascotPos:'left',mascotWidth:82,showSubtitle:true},mascot:'',extraImages:[],gallery:[],seriesOrder:'newest',homeUrl:'index.html'});
 const safeImage=s=>typeof s==='string'&&/^data:image\/(png|jpeg|webp|gif);base64,[a-z0-9+/=]+$/i.test(s)?s:'';
 let data=fresh(),tab='main',device='desktop',imageRequest;
+// Keep history in memory only; cap snapshots because pages can contain embedded images.
+let history=[JSON.stringify(data)],historyIndex=0,historyPath=null,lastHistoryPath=null,lastHistoryTime=0;
+function historyButtons(){
+  $('undoBtn').disabled=historyIndex===0;
+  $('redoBtn').disabled=historyIndex===history.length-1;
+}
+function remember(){
+  const snapshot=JSON.stringify(data),now=Date.now();
+  if(snapshot===history[historyIndex])return;
+  const merge=historyPath&&historyPath===lastHistoryPath&&now-lastHistoryTime<700&&historyIndex===history.length-1&&historyIndex>0;
+  history.splice(historyIndex+1);
+  if(merge)history[historyIndex]=snapshot;
+  else{history.push(snapshot);if(history.length>50)history.shift();historyIndex=history.length-1;}
+  lastHistoryPath=historyPath;lastHistoryTime=now;
+  historyButtons();
+}
+function travelHistory(direction){
+  const next=historyIndex+direction;
+  if(next<0||next>=history.length)return;
+  historyIndex=next;data=JSON.parse(history[historyIndex]);imageRequest=null;
+  lastHistoryPath=null;closeCodePanel();renderEditor();updatePreview(false);scheduleDraft();historyButtons();
+  setStatus(direction<0?'元に戻しました':'やり直しました');
+}
+$('undoBtn').onclick=()=>travelHistory(-1);
+$('redoBtn').onclick=()=>travelHistory(1);
 const setStatus=s=>{$('status').textContent=s};
 const field=(label,path,value,kind='text',extra='')=>`<div class="field"><label for="${path}">${escapeHtml(label)}</label>${kind==='textarea'?`<textarea id="${path}" data-path="${path}" rows="5">${escapeHtml(value)}</textarea>`:kind==='select'?`<select id="${path}" data-path="${path}">${extra}</select>`:`<input id="${path}" data-path="${path}" type="${kind}" value="${escapeHtml(value)}" ${extra}>`}</div>`;
 const option=(v,t,cur)=>`<option value="${escapeHtml(v)}" ${String(v)===String(cur)?'selected':''}>${escapeHtml(t)}</option>`;
@@ -122,18 +148,18 @@ ${field('キャプション',`gallery.${i}.caption`,item.caption)}
 <button class="btn warn" data-action="delete-gallery" data-index="${i}">この画像枠を削除</button></div>`).join('')}
 <button class="btn" data-action="add-gallery">＋ 画像枠を追加</button></div>`:''}</div>`;
 $('editorContent').innerHTML=html; bindEditor();}
-function linkEditor(){return `<div class="group"><h3>リンク一覧</h3><p class="help">リンクはカードで表示します。画像を設定するとアイコン文字より優先されます。</p>${data.links.map((l,i)=>`<div class="group">${field('リンクの表示名',`links.${i}.title`,l.title)}${field('リンク先',`links.${i}.url`,l.url)}${field('短い説明（任意）',`links.${i}.description`,l.description||'')}${field('アイコン文字（例 📚・🔮）',`links.${i}.icon`,l.icon,'text','maxlength="12"')}${imageEditor('リンク画像',`links.${i}.image`,l,'image')}<div class="tools">
+function linkEditor(){return `<div class="group"><h3>リンク一覧</h3><label class="check"><input type="checkbox" data-path="showLinks" ${data.showLinks?'checked':''}>リンク欄を表示</label>${field('リンク欄の見出し（空欄なら見出しなし）','linksTitle',data.linksTitle)}<p class="help">カテゴリーは同じ名前ごとにまとまります。空欄のリンクはカテゴリーなしで表示します。</p><p class="help">リンクはカードで表示します。画像を設定するとアイコン文字より優先されます。</p>${data.links.map((l,i)=>`<div class="group">${field('リンクの表示名',`links.${i}.title`,l.title)}${field('カテゴリー（任意）',`links.${i}.category`,l.category||'')}${field('リンク先',`links.${i}.url`,l.url)}${field('短い説明（任意）',`links.${i}.description`,l.description||'')}${field('アイコン文字（例 📚・🔮）',`links.${i}.icon`,l.icon,'text','maxlength="12"')}${imageEditor('リンク画像',`links.${i}.image`,l,'image')}<div class="tools">
   <button class="btn" data-action="move-link" data-index="${i}" data-direction="-1" aria-label="${i+1}番目のリンクを上へ" ${i===0?'disabled':''}>↑ 上へ</button>
   <button class="btn" data-action="move-link" data-index="${i}" data-direction="1" aria-label="${i+1}番目のリンクを下へ" ${i===data.links.length-1?'disabled':''}>↓ 下へ</button>
   <button class="btn warn" data-action="delete-link" data-index="${i}">削除</button>
 </div></div>`).join('')}<button class="btn" data-action="add-link">＋ リンクを追加</button></div>`}
-function updateByPath(path,value){const parts=path.split('.');let obj=data;for(let i=0;i<parts.length-1;i++){obj=obj[parts[i]];}obj[parts.at(-1)]=value;if(path==='type'){let t=value;data.type=t;data.fileName=t==='home'?'index.html':t==='series'?'series.html':'page.html';renderEditor();}updatePreview();setStatus('編集中')}
+function updateByPath(path,value){historyPath=path;const parts=path.split('.');let obj=data;for(let i=0;i<parts.length-1;i++){obj=obj[parts[i]];}obj[parts.at(-1)]=value;if(path==='type'){let t=value;data.type=t;data.fileName=t==='home'?'index.html':t==='series'?'series.html':'page.html';renderEditor();}updatePreview();historyPath=null;setStatus('編集中')}
 function bindEditor(){document.querySelectorAll('[data-path]').forEach(el=>{const evt=el.type==='checkbox'||el.type==='color'||el.tagName==='SELECT'||el.type==='date'?'change':'input';el.addEventListener(evt,()=>{let v=el.type==='checkbox'?el.checked:el.value;if(el.type==='number')v=Number(v);updateByPath(el.dataset.path,v);});});document.querySelectorAll('[data-action]').forEach(el=>el.addEventListener('click',()=>{const a=el.dataset.action,i=Number(el.dataset.index);if(a==='add-entry')data.entries.unshift({id:'note-'+Date.now(),date:today(),title:'',body:''});if(a==='archive-latest'){
 if(!String(data.pageTitle??'').trim()&&!String(data.body??'').trim()&&!safeImage(data.coverImage)){
   setStatus('過去ログに移すコラムを入力してください');
   return;
 }
-data.entries.unshift({id:'note-'+Date.now(),date:data.date,title:data.pageTitle||'無題',body:data.body,image:data.coverImage,imageAlt:data.coverAlt});data.date=today();data.pageTitle='';data.body='';data.coverImage='';data.coverAlt='';tab='main';selectTab('main');setStatus('前のコラムを過去ログへ移動しました');return;}if(a==='delete-entry'&&confirm('この過去記事を削除しますか？'))data.entries.splice(i,1);if(a==='add-section')data.sections.push({date:today(),title:'',body:''});if(a==='delete-section'&&confirm('この記事を削除しますか？'))data.sections.splice(i,1);if(a==='move-link'){
+data.entries.unshift({id:'note-'+Date.now(),date:data.date,title:data.pageTitle||'無題',body:data.body,image:data.coverImage,imageAlt:data.coverAlt});data.date=today();data.pageTitle='';data.body='';data.coverImage='';data.coverAlt='';tab='main';selectTab('main');updatePreview();setStatus('前のコラムを過去ログへ移動しました');return;}if(a==='delete-entry'&&confirm('この過去記事を削除しますか？'))data.entries.splice(i,1);if(a==='add-section')data.sections.push({date:today(),title:'',body:''});if(a==='delete-section'&&confirm('この記事を削除しますか？'))data.sections.splice(i,1);if(a==='move-link'){
   const direction=Number(el.dataset.direction);
   const target=i+direction;
   if(target<0||target>=data.links.length)return;
@@ -245,11 +271,19 @@ function contentImage(image,alt,cssClass='column-image'){
   return safeImage(image)?`<img class="${cssClass}" src="${escapeHtml(image)}" alt="${escapeHtml(alt)}">`:'';
 }
 function cornerLinks(){
-  return `<section id="links"><h2 class="sectiontitle">連載・その他のページ</h2><ul class="corner-grid">${data.links.map(l=>{
+  if(!data.showLinks)return '';
+  const groups=new Map();
+  for(const link of data.links){
+    const category=String(link.category??'').trim();
+    if(!groups.has(category))groups.set(category,[]);
+    groups.get(category).push(link);
+  }
+  const cards=links=>links.map(l=>{
     const visual=contentImage(l.image,'','corner-image')||
       (l.icon?`<span class="corner-icon" aria-hidden="true">${escapeHtml(l.icon)}</span>`:'');
     return `<li><a class="corner-card" href="${escapeHtml(safeUrl(l.url))}">${visual}<span class="corner-copy"><strong>${escapeHtml(l.title)}</strong>${l.description?`<small>${escapeHtml(l.description)}</small>`:''}</span></a></li>`;
-  }).join('')}</ul></section>`;
+  }).join('');
+  return `<section id="links">${data.linksTitle?`<h2 class="sectiontitle">${escapeHtml(data.linksTitle)}</h2>`:''}${Array.from(groups,([category,links])=>`${category?`<h3>${escapeHtml(category)}</h3>`:''}<ul class="corner-grid">${cards(links)}</ul>`).join('')}</section>`;
 }
 function seriesMarkup(heading,cover,links){
   // The original index keeps the episode number and anchor stable across display orders.
@@ -259,14 +293,14 @@ function seriesMarkup(heading,cover,links){
     `<li><a href="#article-${number}">${escapeHtml(entry.title||'無題')}</a></li>`).join('')}</ol></section>`:'';
   const articles=episodes.map(({entry:e,number},index)=>`<article class="seriesitem" id="article-${number}"><p class="episode-number">第${number}回</p>${columnHeading(e.title,e.date)}
     ${contentImage(e.image,e.imageAlt)}<div class="bodytext">${index===0?featuredBody(e.body):paragraphs(e.body)}</div></article>`).join('');
-  return `${heading}${cover}<section aria-label="連載の記事">${articles||'<p>まだ記事がありません。</p>'}</section>${index}<hr>${links}`;
+  return `${heading}${cover}<section aria-label="連載の記事">${articles||'<p>まだ記事がありません。</p>'}</section>${index}${links?'<hr>'+links:''}`;
 }
 function freeMarkup(heading,cover,links){
   const figures=data.gallery.filter(item=>safeImage(item.image)).map(item=>
     `<figure>${contentImage(item.image,item.alt,'gallery-image')}${item.caption?`<figcaption>${escapeHtml(item.caption)}</figcaption>`:''}</figure>`).join('');
   return `<article class="free-page">${heading}<div class="free-content${cover&&data.coverLayout!=='top'?' with-side-cover':''}">
     ${cover}<div class="bodytext">${paragraphs(data.body)}</div></div>
-    ${figures?`<section class="gallery-section"><h3 class="sectiontitle">ギャラリー</h3><div class="gallery">${figures}</div></section>`:''}</article><hr>${links}`;
+    ${figures?`<section class="gallery-section"><h3 class="sectiontitle">ギャラリー</h3><div class="gallery">${figures}</div></section>`:''}</article>${links?'<hr>'+links:''}`;
 }
 function siteMarkup(){
   const d=data.design;
@@ -277,7 +311,7 @@ function siteMarkup(){
 let main='';if(data.type==='home'){
   const {recent,months}=splitColumns();
   const logs=recent.map(e=>`<details class="archiveitem"><summary>${columnHeading(e.title,e.date,'')}</summary><div class="bodytext">${contentImage(e.image,e.imageAlt)}${paragraphs(e.body)}</div></details>`).join('');
-  main=`<article id="latest">${headline}${cover}<div class="bodytext">${featuredBody(data.body)}</div></article><hr><details class="archive" id="archive"><summary>過去のコラム（${recent.length}件）</summary>${logs||'<p>まだありません。</p>'}</details>${archiveLinks(months)}<hr>${links}`;
+  main=`<article id="latest">${headline}${cover}<div class="bodytext">${featuredBody(data.body)}</div></article><hr><details class="archive" id="archive"><summary>過去のコラム（${recent.length}件）</summary>${logs||'<p>まだありません。</p>'}</details>${archiveLinks(months)}${links?'<hr>'+links:''}`;
 }
 else if(data.type==='series')main=seriesMarkup(headline,cover,links);
 else main=freeMarkup(headline,cover,links);
@@ -324,6 +358,7 @@ function showArchiveExport(){
   panel.scrollIntoView({block:'nearest'});
 }
 function updatePreview(saveDraft=true){
+  if(saveDraft)remember();
   $('preview').srcdoc=makeHtml();
   $('archiveBtn').disabled=data.type!=='home';
   $('archiveBtn').setAttribute('aria-expanded','false');
@@ -449,7 +484,7 @@ function validate(x){
     &&[x.entries,x.links,x.sections,...(x.gallery===undefined?[]:[x.gallery])].every(list=>Array.isArray(list)
       &&list.every(row=>row&&typeof row==='object'&&!Array.isArray(row)));
 }
-function restore(x,saveDraft=true){if(!validate(x))throw Error('このビルダーに対応したデータではありません');imageRequest=null;data=Object.assign(fresh(x.type),x,{design:Object.assign(fresh().design,x.design)});closeCodePanel();selectTab('main');updatePreview(saveDraft);setStatus('読み込みました');}
+function restore(x,saveDraft=true){if(!validate(x))throw Error('このビルダーに対応したデータではありません');imageRequest=null;data=Object.assign(fresh(x.type),x,{design:Object.assign(fresh().design,x.design)});closeCodePanel();selectTab('main');updatePreview(saveDraft);if(!saveDraft){history=[JSON.stringify(data)];historyIndex=0;lastHistoryPath=null;historyButtons();}setStatus('読み込みました');}
 async function readFile(input,mode){const f=input.files?.[0];input.value='';if(!f)return;try{const s=await f.text();if(mode==='json')restore(await parseCode(s));else{const doc=new DOMParser().parseFromString(s,'text/html');const e=doc.getElementById('site-builder-data');if(!e)throw Error('編集データの埋め込まれたHTMLではありません');restore(JSON.parse(e.textContent));}}catch(err){alert('読み込み失敗：'+err.message)}}
 const DRAFT_KEY='small-site-builder:draft:v1';
 let draftDb,draftTimer,draftRevision=0;
