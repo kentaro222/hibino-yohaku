@@ -431,9 +431,9 @@ const header=data.type==='home'
   ?`<header><h1>${escapeHtml(data.siteTitle)}</h1>${d.showSubtitle?`<p class="sub">${escapeHtml(data.siteSubtitle)}</p>`:''}</header>`
   :`<header class="site-return"><a href="${escapeHtml(safeUrl(data.homeUrl))}">← ${escapeHtml(data.siteTitle||'トップページ')}</a></header>`;
 return `<div class="site">${header}<hr><main id="main">${main}</main><hr><footer>© ${new Date().getFullYear()} ${escapeHtml(data.siteTitle)}</footer></div>`}
-function pageHtml(title,markup,extra=''){
+function pageHtml(title,markup,extra='',faviconPath='./favicon.png'){
   return `<!doctype html>
-<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)}</title><meta name="description" content="${escapeHtml(data.siteSubtitle)}"><style>${css()}</style></head><body>${markup}${extra}</body></html>`;
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)}</title><link rel="icon" type="image/png" href="${escapeHtml(faviconPath)}"><meta name="description" content="${escapeHtml(data.siteSubtitle)}"><style>${css()}</style></head><body>${markup}${extra}</body></html>`;
 }
 function makeHtml(includeCopyButton=true){
   const embedded=JSON.stringify(data).replace(/</g,'\\u003c').replace(/>/g,'\\u003e').replace(/&/g,'\\u0026').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029');
@@ -447,7 +447,7 @@ function makeArchiveHtml(month,entries){
   const home='../'+encodeURIComponent(filename(data.fileName,'html'));
   const articles=entries.map(e=>`<article class="seriesitem">${columnHeading(e.title,e.date,'h3')}${imageContent(contentImage(e.image,e.imageAlt),`<div class="bodytext">${paragraphs(e.body)}</div>`,e.imageLayout,e.imageWidth,e.bodyImages)}</article>`).join('');
   return pageHtml(title+' | '+data.siteTitle,
-    `<div class="site"><header><h1>${escapeHtml(data.siteTitle)}</h1></header><nav aria-label="ページ移動"><a href="${home}">トップページに戻る</a></nav><main><h2 class="sectiontitle">${title}</h2>${articles}</main></div>`);
+    `<div class="site"><header><h1>${escapeHtml(data.siteTitle)}</h1></header><nav aria-label="ページ移動"><a href="${home}">トップページに戻る</a></nav><main><h2 class="sectiontitle">${title}</h2>${articles}</main></div>`,'','../favicon.png');
 }
 function showArchiveExport(){
   const {months}=splitColumns();
